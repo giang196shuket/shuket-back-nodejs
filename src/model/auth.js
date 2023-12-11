@@ -1,10 +1,9 @@
 const pool = require("../../config/database");
 const logger = require("../../config/logger");
 const moment = require("moment");
-const { password_verify } = require("../../helper/auth");
+const { password_verify } = require("../helper/auth");
 
 module.exports = class authModel {
-  
   static async check_login(id, password) {
     let logBase = `models/userModel.getUser:`;
     try {
@@ -15,9 +14,9 @@ module.exports = class authModel {
       const [rows] = await pool.mysqlPool.query(sql, [id]);
 
       if (!rows[0]) {
-        return "not_exist";
+        return { status: false, msg: "not_exist" };
       } else if (rows[0].U_STATUS === "S") {
-        return "suspend_id";
+        return { status: false, msg: "suspend_id" };
       } else if (
         rows[0].U_STATUS === "A" &&
         password_verify(password, rows[0].U_PWD)
@@ -30,22 +29,25 @@ module.exports = class authModel {
         await pool.mysqlPool.query(sql, [time, time, "SYSTEM", id]);
 
         return {
-          user_id: rows[0].U_ID,
-          u_acc: rows[0].U_ACC,
-          u_martid: rows[0].U_MARTID,
-          u_name: rows[0].U_NAME,
-          u_phone: rows[0].U_PHONE,
-          u_email: rows[0].U_EMAIL,
-          u_level: rows[0].U_LEVEL,
-          ctime: rows[0].C_TIME,
-          is_change: 0,
-          old_userid: rows[0].U_ID,
-          old_uacc: rows[0].U_ACC,
-          old_martid: "",
-          old_ulevel: rows[0].U_LEVEL,
+          status: true,
+          data: {
+            user_id: rows[0].U_ID,
+            u_acc: rows[0].U_ACC,
+            u_martid: rows[0].U_MARTID,
+            u_name: rows[0].U_NAME,
+            u_phone: rows[0].U_PHONE,
+            u_email: rows[0].U_EMAIL,
+            u_level: rows[0].U_LEVEL,
+            ctime: rows[0].C_TIME,
+            is_change: 0,
+            old_userid: rows[0].U_ID,
+            old_uacc: rows[0].U_ACC,
+            old_martid: "",
+            old_ulevel: rows[0].U_LEVEL,
+          },
         };
       } else {
-        return "invalid_pw";
+        return { status: false, msg: "invalid_pw" };
       }
     } catch (error) {
       logger.writeLog("error", `${logBase} : ${error.stack}`);
