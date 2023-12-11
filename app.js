@@ -31,6 +31,6 @@ app.use(function (req, res, next) {
 });
 
 //router
-app.use("/auth",authRouter);
+app.use("/auth", authRouter);
 
 module.exports = app;

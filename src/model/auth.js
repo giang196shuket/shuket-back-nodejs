@@ -5,9 +5,9 @@ const { password_verify } = require("../helper/auth");
 
 module.exports = class authModel {
   static async check_login(id, password) {
-    let logBase = `models/userModel.getUser:`;
+    let logBase = `models/authModel.check_login:`;
     try {
-      const sql = `SELECT U_ID, U_ACC, U_PWD, U_MARTID, U_COMPANY, U_NAME, U_NAME, U_STATUS, U_PHONE, U_EMAIL, U_GROUP, U_LEVEL, U_LLOGIN, C_TIME
+      let sql = `SELECT U_ID, U_ACC, U_PWD, U_MARTID, U_COMPANY, U_NAME, U_NAME, U_STATUS, U_PHONE, U_EMAIL, U_GROUP, U_LEVEL, U_LLOGIN, C_TIME
             FROM TBL_MOA_USERS_ADMIN
             WHERE BINARY U_ACC = ?
             AND U_STATUS IN ('A', 'S')`;
@@ -21,7 +21,7 @@ module.exports = class authModel {
         rows[0].U_STATUS === "A" &&
         password_verify(password, rows[0].U_PWD)
       ) {
-        const sql = `UPDATE TBL_MOA_USERS_ADMIN
+        sql = `UPDATE TBL_MOA_USERS_ADMIN
                     SET U_LLOGIN = ?, M_TIME = ?, M_ID = ?
                     WHERE U_ACC = ? `;
         const time = moment().format("YYYY-MM-DD h:mm:ss");
@@ -51,7 +51,7 @@ module.exports = class authModel {
       }
     } catch (error) {
       logger.writeLog("error", `${logBase} : ${error.stack}`);
-      return null;
+      return { status: false, msg: error.stack };
     }
   }
 };

@@ -2,8 +2,9 @@
 const user_agent = require('user_agent');
 const ip = require('ip');
 const jwt = require('jsonwebtoken');
-
 const logger = require("../../config/logger");
+
+const jwt_key = 'eyJ0eXAiOiJKV1QiLOcMgo2o!)@)#)I1NiJ9IiRkYXRhIg'
 
 module.exports = {    
   password_verify(password, hash) {
@@ -38,7 +39,7 @@ module.exports = {
         logger.writeLog("info", `${logBase} : Begin generate JWT: ${JSON.stringify(token_data)}`);
 
         //Generate JWT Token
-        const token =  jwt.sign(token_data, 'eyJ0eXAiOiJKV1QiLOcMgo2o!)@)#)I1NiJ9IiRkYXRhIg', { expiresIn: 3600, algorithm:"HS256" });
+        const token =  jwt.sign(token_data, jwt_key, { expiresIn: 3600, algorithm:"HS256" });
 
         if (token) {
           logger.writeLog("info", `${logBase} :  Generate JWT is successful =>: ${JSON.stringify(token_data)}`);
