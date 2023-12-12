@@ -9,7 +9,9 @@ const morgan = require("morgan");
 const appRoot = require('app-root-path') 
 const createError = require("http-errors");
 
+//get router
 const authRouter = require("./src/router/auth");
+const mainRouter = require("./src/router/main");
 
 const app = express();
 dotenv.config({ path: `${appRoot}/config/config.env` });
@@ -19,7 +21,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
-
 app.use(function (err, req, res, next) {
  console.log('error app.js', err)
 });
@@ -30,7 +31,8 @@ app.use(function (req, res, next) {
   next()
 });
 
-//router
+//use router
 app.use("/auth", authRouter);
+app.use("/main", mainRouter);
 
 module.exports = app;

@@ -1,8 +1,10 @@
 const logger = require("../../config/logger");
+const { responseErrorInput } = require("../helper/response");
 
 module.exports = {    
    
     async validation_login(req, res, next) {
+
         let logBase = `validation/auth/validation_login: `;
         const id = req.body.id
         const password = req.body.pw
@@ -25,10 +27,7 @@ module.exports = {
                     "error": "The pw field can not empty"
                 })
             }
-            return  res.status(200).json({
-                status:'failure',
-                errors: errors
-            });
+            return  res.status(200).json(responseErrorInput(errors));
         }
 
         if(id.length > 40){

@@ -4,7 +4,7 @@ mysqlConfig = {
     user: "moadev",
     password: "Ectus!2#",
     port     : 3306,
-    database : 'moa-platform',
+    database : 'moa_platform',
     charset  : 'utf8'
 };
 
