@@ -1,4 +1,5 @@
 const logger = require("../../config/logger");
+const { messageError } = require("../helper/message");
 const { responseErrorInput } = require("../helper/response");
 
 module.exports = {    
@@ -17,14 +18,14 @@ module.exports = {
                 errors.push( {
                     "code": 600,
                     "field": "id",
-                    "error": "The id field can not empty"
+                    "error": messageError.IdNotEmpty
                 })
             }
             if(password === ""){
                 errors.push( {
                     "code": 600,
                     "field": "pw",
-                    "error": "The pw field can not empty"
+                    "error":  messageError.PwNotEmpty
                 })
             }
             return  res.status(200).json(responseErrorInput(errors));

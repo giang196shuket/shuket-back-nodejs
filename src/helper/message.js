@@ -3,6 +3,8 @@
 }
 
  const messageError = {
+   IdNotEmpty:'The id field can not empty',
+   PwNotEmpty: 'The pw field can not empty',
    TokenInvalid: "Invalid login token.",
    TokenEmpty : "The token field can not empty",
    ErrorServer: 'Error server',
