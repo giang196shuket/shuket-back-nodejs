@@ -1,31 +1,42 @@
 const userModel = require("../model/user");
 function BuildChild(data, currentChild) {
+  console.log(currentChild)
   var Object = {};
-  Object.SEQ = currentChild.SEQ;
-  Object.NAME = currentChild.NAME;
-  Object.PARENT_SEQ = currentChild.PARENT_SEQ;
-  Object.TYPE = currentChild.TYPE;
-  Object.KEY_S3 = currentChild.KEY_S3;
-  Object.children = [];
+  var name = {};
 
-  var child = data.filter((item) => item.PARENT_SEQ == Object.SEQ);
+  Object.code = currentChild.U_CATE_CODE;
+  Object.route = currentChild.URL;
+  Object.sort2 = currentChild.SORT_ORDER;
+  Object.chk_flag = true;
+  name.vn = currentChild.U_CATE_NAME;
+  name.en = currentChild.U_CATE_NAME_EN;
+  name.kr = currentChild.U_CATE_NAME_KR;
+
+  Object.name = name;
+
+  Object.group_items = [];
+
+  var child = data.filter((item) => item.U_CATE_PCD == Object.code);
   if (child.length > 0) {
     child.forEach(function (item) {
-      Object.children.push(BuildChild(data, item));
+      Object.group_items.push(BuildChild(data, item));
     });
+    Object.group_items.sort(function(a, b){return a.code - b.code});
+
   }
   return Object;
 }
 async function mergeRoleList(arr1, arr2, hasPer = true) {
-  console.log('arr1', arr1)
-  console.log('arr2', arr2)
 
-  const result = JSON.stringify(
-    BuildChild(
-      data,
-      data.find((item) => item.SEQ == folderId)
-    )
-  );
+  let arrMerge = [...arr1, ...arr2];
+
+  // console.log('arrMerge', arrMerge)
+
+  const result = 
+    BuildChild( arrMerge, arrMerge.find((item) => item.U_CATE_CODE = 30000))
+    // BuildChild( arrMerge, arrMerge[0])
+
+  return result
 }
 
 module.exports = { mergeRoleList };

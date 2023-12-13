@@ -133,13 +133,10 @@ module.exports = {
       const currentUserProgs = await userModel.select_progs_role_by_user(user)
       const levelProgs = await userModel.select_progs_role_by_level(user.level_id)
 
-     const arrCateCodes = levelProgs?.map((r) => r.U_CATE_CODE);
 
-     const listProgs = await mergeRoleList(currentUserProgs, arrCateCodes);
+     const listProgs = await mergeRoleList(currentUserProgs, levelProgs);
      const data = {
-        data: {
             left_menu: listProgs,
-          },
      };
 
 
