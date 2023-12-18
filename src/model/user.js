@@ -115,6 +115,7 @@ module.exports = class userModel {
     
       logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);
+      console.log('rows', rows)
       return rows
     } catch (error) {
       logger.writeLog("error", `${logBase} : ${error.stack}`);
