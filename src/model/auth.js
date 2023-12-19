@@ -4,8 +4,8 @@ const moment = require("moment");
 const { password_verify } = require("../service/auth");
 
 module.exports = class authModel {
-  static async check_login(id, password) {
-    let logBase = `models/authModel.check_login:  id(${id})  password(${password})`;
+  static async checkLogin(id, password) {
+    let logBase = `models/authModel.checkLogin:  id(${id})  password(${password})`;
     try {
       let sql = `SELECT U_ID, U_ACC, U_PWD, U_MARTID, U_COMPANY, U_NAME, U_NAME, U_STATUS, U_PHONE, U_EMAIL, U_GROUP, U_LEVEL, U_LLOGIN, C_TIME
             FROM TBL_MOA_USERS_ADMIN

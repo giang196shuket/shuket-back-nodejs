@@ -4,9 +4,9 @@ const { responseErrorInput } = require("../helper/response");
 
 module.exports = {    
    
-    async validation_login(req, res, next) {
+    async validationLogin(req, res, next) {
 
-        let logBase = `validation/auth/validation_login: `;
+        let logBase = `validation/auth/validationLogin: `;
         const id = req.body.id
         const password = req.body.pw
         logger.writeLog("info", `${logBase} Admin Login start with => : ${id}`);

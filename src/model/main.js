@@ -4,8 +4,8 @@ const moment = require("moment");
 const { password_verify } = require("../service/auth");
 
 module.exports = class mainModel {
-  static async get_user_profile(user_id) {
-    let logBase = `models/mainModel.get_user_profile:  user_id(${user_id})`;
+  static async getUserProfile(user_id) {
+    let logBase = `models/mainModel.getUserProfile:  user_id(${user_id})`;
       try {
       const sql = `SELECT
       MUA.SEQ AS U_SEQ, MUA.U_ID, MUA.U_ACC, MUA.U_GROUP, MUL.U_LEVEL_TYPE, MUA.U_LEVEL, MUA.U_NAME, MMB.M_NAME, MMB.M_LOGO, MMB.M_LOGO_PUSH, MUA.U_STATUS
@@ -23,8 +23,8 @@ module.exports = class mainModel {
       return null
     }
   }
-  static async get_mart_info_switch(mart_moa_code) {
-    let logBase = `models/mainModel.get_mart_info_switch: mart_moa_code(${mart_moa_code})`;
+  static async getMartInfoSwitch(mart_moa_code) {
+    let logBase = `models/mainModel.getMartInfoSwitch: mart_moa_code(${mart_moa_code})`;
       try {
         const sql = `SELECT MB.M_LOGO, MB.M_NAME, MB.M_LOGO, MB.M_LOGO_PUSH
       FROM
@@ -39,8 +39,8 @@ module.exports = class mainModel {
       return null
     }
   }
-  static async get_list_qa_not_relay(mart_id) {
-    let logBase = `models/mainModel.get_list_qa_not_relay: mart_id(${mart_id})`;
+  static async getListQaNotRelay(mart_id) {
+    let logBase = `models/mainModel.getListQaNotRelay: mart_id(${mart_id})`;
       try {
         const  sql = `SELECT QNA_TITLE as qa_title, C_TIME as c_time, QNA_CODE as qa_seq
 			FROM TBL_MOA_QNA_MAIN
@@ -54,8 +54,8 @@ module.exports = class mainModel {
       return null
     }
   }
-  static async get_moa_setting_config(mart_id) {
-    let logBase = `models/mainModel.get_moa_setting_config: mart_id(${mart_id})`;
+  static async getMoaSettingConfig(mart_id) {
+    let logBase = `models/mainModel.getMoaSettingConfig: mart_id(${mart_id})`;
       try {
         const  sql = `SELECT * FROM TBL_MOA_SITE_CONFIG WHERE CONFIG_NAME = 'BANNER_HOTLINE' AND IS_USE = 'Y' LIMIT 1 `;
 

@@ -1,7 +1,7 @@
 const { configAws } = require("../../config/image_aws");
 
 module.exports = {
-  async load_image_aws(images, config_name, image_key = "", no_image = true) {
+  async loadImageAws(images, config_name, image_key = "", no_image = true) {
     if (!images || !config_name) return "";
 
     const configs = configAws.upload;

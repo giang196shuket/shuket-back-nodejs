@@ -5,8 +5,8 @@ const { password_verify } = require("../service/auth");
 
 module.exports = class userModel {
 
-  static async select_progs_role_by_user(user, is_null = false) {
-    let logBase = `models/userModel.select_progs_role_by_user:  user(${user})`;
+  static async selectProgsRoleByUser(user, is_null = false) {
+    let logBase = `models/userModel.selectProgsRoleByUser:  user(${user})`;
       try {
         if (!user.level_id || !user.user_id) {
             return null;
@@ -83,8 +83,8 @@ module.exports = class userModel {
       return null
     }
   }
-  static async select_progs_role_by_level(level_id) {
-    let logBase = `models/userModel.select_progs_role_by_level: level_id(${level_id})`;
+  static async selectProgsRoleByLevel(level_id) {
+    let logBase = `models/userModel.selectProgsRoleByLevel: level_id(${level_id})`;
       try {
         const  sql = `SELECT
         UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE, UC.SORT_ORDER
@@ -103,8 +103,8 @@ module.exports = class userModel {
       return null
     }
   }
-  static async select_prog_by_code(cate_code) {
-    let logBase = `models/userModel.select_prog_by_code: cate_code(${cate_code})`;
+  static async selectProgByCode(cate_code) {
+    let logBase = `models/userModel.selectProgByCode: cate_code(${cate_code})`;
       try {
         const  sql = `SELECT
         UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE, UC.SORT_ORDER
@@ -115,7 +115,6 @@ module.exports = class userModel {
     
       logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);
-      console.log('rows', rows)
       return rows
     } catch (error) {
       logger.writeLog("error", `${logBase} : ${error.stack}`);

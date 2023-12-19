@@ -11,7 +11,7 @@ const jwt_expires = 3600
 
 module.exports = {    
 
-  async password_verify(password, hash) {
+  async passwordVerify(password, hash) {
 
     const compare = bcrypt.compareSync(password, hash)
 
@@ -25,7 +25,7 @@ module.exports = {
     }
 
   },
-  async validate_token (token) {
+  async validateToken (token) {
     try {
       var decoded = jwt.verify(token, jwt_key)
       if(decoded && decoded.user_id){
@@ -37,8 +37,8 @@ module.exports = {
       return null
     }
   },
-  async generate_token(userData, userAgent) {
-    const logBase = 'helper/auth/generate_token';
+  async generateToken(userData, userAgent) {
+    const logBase = 'helper/auth/generateToken';
     try {
         let token_data = {
           user_id : userData.data.user_id,

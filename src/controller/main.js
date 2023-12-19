@@ -3,27 +3,27 @@ const { generate_token } = require("../service/auth");
 const { messageError, messageSuccess } = require("../helper/message");
 const { responseSuccess, responseErrorData } = require("../helper/response");
 const mainModel = require("../model/main");
-const { load_image_aws } = require("../service/loadImage");
+const { loadImageAws } = require("../service/loadImage");
 const userModel = require("../model/user");
 const { mergeRoleList } = require("../helper/funtion");
 
 module.exports = {    
    
-    async get_user_profile(req, res, next) {
-        const logBase = `controller/main/get_user_profile: `;
+    async getUserProfile(req, res, next) {
+        const logBase = `controller/main/getUserProfile: `;
         let dataResponse = {}
         const user = req.body
-        const userProfile = await mainModel.get_user_profile(user.user_id)
+        const userProfile = await mainModel.getUserProfile(user.user_id)
         if(userProfile){
             dataResponse.user_name = userProfile.U_NAME
             dataResponse.user_role = userProfile.U_LEVEL_TYPE
             dataResponse.user_level = userProfile.U_LEVEL
             dataResponse.user_status = userProfile.U_STATUS
             if (userProfile.M_LOGO !== "") {
-                dataResponse.mart_logo = await load_image_aws(userProfile.M_LOGO, 'mart/logo');
+                dataResponse.mart_logo = await loadImageAws(userProfile.M_LOGO, 'mart/logo');
               }
             if (userProfile.M_LOGO_PUSH !== "") {
-                dataResponse.mart_logo_push = await load_image_aws(userProfile.M_LOGO_PUSH, 'mart/logo');
+                dataResponse.mart_logo_push = await loadImageAws(userProfile.M_LOGO_PUSH, 'mart/logo');
             }
             dataResponse.mart_name = userProfile.M_NAME
 
@@ -44,18 +44,18 @@ module.exports = {
             dataResponse.old_user_name = userProfile.U_NAME
             dataResponse.sw_level = user.old_ulevel
             dataResponse.user_status = 'A'
-            const martSwitch = await mainModel.get_mart_info_switch(user.u_martid);
+            const martSwitch = await mainModel.getMartInfoSwitch(user.u_martid);
             if (martSwitch.M_LOGO !== "") {
-                dataResponse.mart_logo = await load_image_aws(martSwitch.M_LOGO, 'mart/logo');
+                dataResponse.mart_logo = await loadImageAws(martSwitch.M_LOGO, 'mart/logo');
             }
             if (martSwitch.M_LOGO_PUSH !== "") {
-                dataResponse.mart_logo_push = await load_image_aws(martSwitch.M_LOGO_PUSH, 'mart/logo');
+                dataResponse.mart_logo_push = await loadImageAws(martSwitch.M_LOGO_PUSH, 'mart/logo');
             }
             dataResponse.mart_name = userProfile.M_NAME
 
         }
         if (user.u_martid != "") {
-           const listQA = await mainModel.get_list_qa_not_relay(user.u_martid);
+           const listQA = await mainModel.getListQaNotRelay(user.u_martid);
            dataResponse.count_qa = listQA?.total_cnt ? listQA.total_cnt : 0
            dataResponse.list_qa = listQA?.data ? listQA.data : []
         
@@ -66,11 +66,11 @@ module.exports = {
         return  res.status(200).json(responseSuccess(200, messageSuccess.Success, dataResponse));
     },
 
-    async get_moa_setting_config(req, res, next){
-        const logBase = `controller/main/get_moa_setting_config: `;
+    async getMoaSettingConfig(req, res, next){
+        const logBase = `controller/main/getMoaSettingConfig: `;
         let moaBannerHotline = '';
         let isUseBanner = 'N';
-        const settingConfig = await mainModel.get_moa_setting_config()
+        const settingConfig = await mainModel.getMoaSettingConfig()
         console.log('settingConfig', settingConfig)
         if(settingConfig.IS_USE === 'Y'){
             moaBannerHotline = settingConfig.CONFIG_VALUE
@@ -85,9 +85,9 @@ module.exports = {
         return res.status(200).json(responseSuccess(200, messageSuccess.Success,result ))
     },
 
-    async get_general_statistics(req, res, next)
+    async getGeneralStatistics(req, res, next)
     {
-      const logBase = `controller/main/get_general_statistics: `;
+      const logBase = `controller/main/getGeneralStatistics: `;
       const user = req.body
 
       let dataRes = {
@@ -126,14 +126,12 @@ module.exports = {
       }
       return res.status(200).json(responseSuccess(200, messageSuccess.Success,dataRes ))
     },
-    async get_left_menu_bar(req, res, next)
+    async getLeftMenuBar(req, res, next)
     {
-      const logBase = `controller/main/get_left_menu_bar: `;
+      const logBase = `controller/main/getLeftMenuBar: `;
       const user = req.body
-      const currentUserProgs = await userModel.select_progs_role_by_user(user)
-      const levelProgs = await userModel.select_progs_role_by_level(user.level_id)
-
-
+      const currentUserProgs = await userModel.selectProgsRoleByUser(user)
+      const levelProgs = await userModel.selectProgsRoleByLevel(user.level_id)
      const listProgs = await mergeRoleList(currentUserProgs, levelProgs);
      const data = {
             left_menu: listProgs,

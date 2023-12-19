@@ -1,5 +1,5 @@
 const logger = require("../../config/logger");
-const { generate_token } = require("../service/auth");
+const { generateToken } = require("../service/auth");
 const authModel = require("../model/auth");
 const { messageError, messageSuccess } = require("../helper/message");
 const { responseSuccess, responseErrorData } = require("../helper/response");
@@ -11,11 +11,11 @@ module.exports = {
         const id = req.body.id
         const password = req.body.pw
 
-        const result = await authModel.check_login(id, password)
+        const result = await authModel.checkLogin(id, password)
 
         if(result.status){
  
-           let token =  await generate_token(result, req.headers['user-agent'])
+           let token =  await generateToken(result, req.headers['user-agent'])
 
            var data = {
                 token: token,
