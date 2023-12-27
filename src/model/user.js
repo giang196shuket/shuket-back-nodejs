@@ -75,7 +75,7 @@ module.exports = class userModel {
                `;
          }
     
-      logger.writeLog("info", `${logBase} : ${sql}`);
+      // logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);
       return rows
     } catch (error) {
@@ -94,8 +94,8 @@ module.exports = class userModel {
         JOIN TBL_MOA_USERS_CATE AS UC ON UC.U_CATE_CODE = ULP.U_CATE_CODE
     WHERE
         ULP.U_LEVEL_CODE = '${level_id}'  ORDER BY SORT_ORDER`;
-        logger.writeLog("info", `${logBase} : ${sql}`);
-
+    
+      // logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);
       return rows
     } catch (error) {
@@ -113,9 +113,9 @@ module.exports = class userModel {
         WHERE
             UC.U_CATE_CODE = '${cate_code}'`;
     
-      logger.writeLog("info", `${logBase} : ${sql}`);
+      // logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);
-      return rows
+      return rows[0]
     } catch (error) {
       logger.writeLog("error", `${logBase} : ${error.stack}`);
       return null

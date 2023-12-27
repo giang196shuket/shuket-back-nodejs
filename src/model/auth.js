@@ -1,7 +1,7 @@
 const pool = require("../../config/database");
 const logger = require("../../config/logger");
 const moment = require("moment");
-const { password_verify } = require("../service/auth");
+const { passwordVerify } = require("../service/auth");
 
 module.exports = class authModel {
   static async checkLogin(id, password) {
@@ -22,7 +22,7 @@ module.exports = class authModel {
         return { status: false, msg: "suspend_id" };
 
       } else if (
-        rows[0].U_STATUS === "A" && await password_verify(password, rows[0].U_PWD)
+        rows[0].U_STATUS === "A" && await passwordVerify(password, rows[0].U_PWD)
       ) {
 
         sql = `UPDATE TBL_MOA_USERS_ADMIN
