@@ -86,14 +86,14 @@ module.exports = class userModel {
   static async selectProgsRoleByLevel(level_id) {
     let logBase = `models/userModel.selectProgsRoleByLevel: level_id(${level_id})`;
       try {
-        const  sql = `SELECT
+        const  sql = ` SELECT
         UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE, UC.SORT_ORDER
     FROM
         TBL_MOA_USERS_LEVEL_PGRM AS ULP
         JOIN TBL_MOA_USERS_LEVEL AS UL ON UL.U_LEVEL_CODE = ULP.U_LEVEL_CODE
         JOIN TBL_MOA_USERS_CATE AS UC ON UC.U_CATE_CODE = ULP.U_CATE_CODE
     WHERE
-        ULP.U_LEVEL_CODE = '${level_id}'  ORDER BY SORT_ORDER`;
+        ULP.U_LEVEL_CODE = '${level_id}' `;
     
       // logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);

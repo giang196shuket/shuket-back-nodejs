@@ -56,8 +56,8 @@ module.exports = {
         }
         if (user.u_martid != "") {
            const listQA = await mainModel.getListQaNotRelay(user.u_martid);
-           dataResponse.count_qa = listQA?.total_cnt ? listQA.total_cnt : 0
-           dataResponse.list_qa = listQA?.data ? listQA.data : []
+           dataResponse.count_qa = listQA.total_cnt ? listQA.total_cnt : 0
+           dataResponse.list_qa = listQA.data ? listQA.data : []
         
           } else {
             dataResponse.count_qa = 0
@@ -132,7 +132,15 @@ module.exports = {
       const user = req.body
       const currentUserProgs = await userModel.selectProgsRoleByUser(user)
       const levelProgs = await userModel.selectProgsRoleByLevel(user.level_id)
-     const listProgs = await mergeRoleList(currentUserProgs, levelProgs);
+      let arrCateCodes = []
+       arrCateCodes = await levelProgs.sort(function(item1, item2) {
+        if (item1.SORT_ORDER > item2.SORT_ORDER) return 1;
+        if (item1.SORT_ORDER < item2.SORT_ORDER) return -1;
+        return 0
+    });
+    arrCateCodes = arrCateCodes.map(x => x.U_CATE_CODE)
+    console.log('arrCateCodes', arrCateCodes)
+     const listProgs = await mergeRoleList(currentUserProgs, arrCateCodes);
      const data = {
             left_menu: listProgs,
      };

@@ -12,6 +12,7 @@ const createError = require("http-errors");
 //get router
 const authRouter = require("./src/router/auth");
 const mainRouter = require("./src/router/main");
+const martRouter = require("./src/router/mart");
 
 const app = express();
 dotenv.config({ path: `${appRoot}/config/config.env` });
@@ -34,5 +35,6 @@ app.use(function (req, res, next) {
 //use router
 app.use("/auth", authRouter);
 app.use("/main", mainRouter);
+app.use("/mart", martRouter);
 
 module.exports = app;
