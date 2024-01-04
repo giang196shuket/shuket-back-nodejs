@@ -13,7 +13,7 @@ module.exports = {
             const decoded = await validateToken(token.split(' ')[1])
             if(decoded){
                 logger.writeLog("info", `${token} : --> Authentication successful`);
-                req.body = decoded
+                req.userInfo = decoded
                 console.log('user', decoded)
                 next()
             }else{

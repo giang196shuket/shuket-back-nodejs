@@ -35,6 +35,6 @@ app.use(function (req, res, next) {
 //use router
 app.use("/auth", authRouter);
 app.use("/main", mainRouter);
-app.use("/mart", martRouter);
+app.use("/sales_collection", martRouter);
 
 module.exports = app;

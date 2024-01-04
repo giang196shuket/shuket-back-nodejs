@@ -12,7 +12,7 @@ module.exports = {
     async getUserProfile(req, res, next) {
         const logBase = `controller/main/getUserProfile: `;
         let dataResponse = {}
-        const user = req.body
+        const user = req.userInfo
         const userProfile = await mainModel.getUserProfile(user.user_id)
         if(userProfile){
             dataResponse.user_name = userProfile.U_NAME
@@ -88,7 +88,7 @@ module.exports = {
     async getGeneralStatistics(req, res, next)
     {
       const logBase = `controller/main/getGeneralStatistics: `;
-      const user = req.body
+      const user = req.userInfo
 
       let dataRes = {
         user: {
@@ -129,21 +129,13 @@ module.exports = {
     async getLeftMenuBar(req, res, next)
     {
       const logBase = `controller/main/getLeftMenuBar: `;
-      const user = req.body
+      const user = req.userInfo
       const currentUserProgs = await userModel.selectProgsRoleByUser(user)
       const levelProgs = await userModel.selectProgsRoleByLevel(user.level_id)
-      let arrCateCodes = []
-       arrCateCodes = await levelProgs.sort(function(item1, item2) {
-        if (item1.SORT_ORDER > item2.SORT_ORDER) return 1;
-        if (item1.SORT_ORDER < item2.SORT_ORDER) return -1;
-        return 0
-    });
-    arrCateCodes = arrCateCodes.map(x => x.U_CATE_CODE)
-    console.log('arrCateCodes', arrCateCodes)
-     const listProgs = await mergeRoleList(currentUserProgs, arrCateCodes);
-     const data = {
-            left_menu: listProgs,
-     };
+      const listProgs = await mergeRoleList(currentUserProgs, levelProgs);
+      const data = {
+              left_menu: listProgs,
+      };
 
 
       return res.status(200).json(responseSuccess(200, messageSuccess.Success,data ))

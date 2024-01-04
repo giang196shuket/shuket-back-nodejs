@@ -1,145 +1,137 @@
 const userModel = require("../model/user");
 
-async function mergeRoleList(arr1, arr2, hasPer = true) {
-  // console.log('arr1', arr1)
-  // console.log('arr2', arr2)
-
-  list = {};
-  cate_lv1 = {};
-  cate_lv2 = {};
-  for ( r of arr1) {
-    
-    // Kiểm tra xem giá trị mảng role user có trong mảng role level không
-    if ( arr2.filter(a2 => a2 === r.U_CATE_CODE).length > 0) {
-      r.HAS_PER = hasPer;
-    } else {
-      r.HAS_PER = !hasPer;
+async function mergeRoleList(arrUser, arrCodeLevel, hasPer = true) {
+  console.time('AVOID DUP')
+  const arrTemp = [...arrUser, ...arrCodeLevel]
+  // chống trùng lặp khi merge 2 mảng
+  let arrMerge =[]
+  let uniqueObject = {};
+     for (let i in arrTemp) {
+         objTitle = arrTemp[i]['U_CATE_CODE'];
+         uniqueObject[objTitle] = arrTemp[i];
     }
-    if (r.U_CATE_DEPT === 3) {
-      // nếu độ sâu phân lớp là 3
-      if (!(r.U_CATE_PCD in cate_lv2)) {
-        // Khóa không tồn tại trong cate_lv2
-        row2 = await userModel.selectProgByCode(r.U_CATE_PCD);
-        if (row2) {
-          cate_lv2[r.U_CATE_PCD] = row2;
+  for (i in uniqueObject) {
+    arrMerge.push(uniqueObject[i]);
+  }
+   // chống trùng lặp khi merge 2 mảng
+   console.timeEnd('AVOID DUP')
+
+  let list = [];
+  let listSub = [];
+
+  console.time('SUB')
+  //lấy danh sách sub
+  for await (const cateUser of arrMerge) {
+    if (cateUser.U_CATE_DEPT === 3) {
+      const data = await userModel.selectProgByCode(cateUser.U_CATE_CODE);
+
+      listSub.push({
+        code: data.U_CATE_CODE,
+        route: data.URL,
+        sort3: data.SORT_ORDER,
+        parent: data.U_CATE_PCD,
+        name: {
+          vn: data.U_CATE_NAME,
+          en: data.U_CATE_NAME_EN,
+          kr: data.U_CATE_NAME_KR,
+        },
+      });
+    }
+  }
+    //lấy danh sách sub
+    console.timeEnd('SUB')
+
+    console.time('MERGE')
+  //lấy danh sách chính và merge với danh sách sub
+  for await (const cateUser of arrMerge) {
+    if (cateUser.U_CATE_DEPT === 3) {
+      const data = await userModel.selectProgByCode(cateUser.U_CATE_PCD);
+      const parentIndex = list.findIndex((ls) => ls.group_code === data.U_CATE_PCD)
+      if (! list[parentIndex].group_items.find((ls) => ls.code === data.U_CATE_CODE)) {
+        if(listSub.find((su) => su.parent === data.U_CATE_CODE)){
+          list[parentIndex].group_items.push({
+            code: data.U_CATE_CODE,
+            route: data.URL,
+            sort2: data.SORT_ORDER,
+            parent: data.U_CATE_PCD,
+            name: {
+              vn: data.U_CATE_NAME,
+              en: data.U_CATE_NAME_EN,
+              kr: data.U_CATE_NAME_KR,
+            },
+            sub_items: listSub.filter((su) => su.parent === data.U_CATE_CODE),
+          });
+        }else{
+          list[parentIndex].group_items.push({
+            code: data.U_CATE_CODE,
+            route: data.URL,
+            sort2: data.SORT_ORDER,
+            parent: data.U_CATE_PCD,
+            name: {
+              vn: data.U_CATE_NAME,
+              en: data.U_CATE_NAME_EN,
+              kr: data.U_CATE_NAME_KR,
+            }
+          });
         }
-      } else {
-        // Khóa  tồn tại trong cate_lv2
-        row2 = cate_lv2[r.U_CATE_PCD];
+       
       }
-
-      if (row2) {
-        if ((row2.U_CATE_PCD in cate_lv1)) {
-          // Khóa không tồn tại trong cate_lv2
-          row1 = await userModel.selectProgByCode(row2.U_CATE_PCD);
-              if (row1) {
-                cate_lv1[row2.U_CATE_PCD] = row1;
-              } 
-          }else {
-            row1 = cate_lv1[row2.U_CATE_PCD];
-          }
-
-          // if (list[row1.U_CATE_CODE] !== undefined || list[row1.U_CATE_CODE] !== null) {
-            //kiểm tra khác undefined ko
-            list[row1.U_CATE_CODE] = {
-              code: row1.U_CATE_CODE,
-              names: {
-                vn: row1.U_CATE_NAME,
-                en: row1.U_CATE_NAME_EN,
-                kr: row1.U_CATE_NAME_KR,
+      
+    } else if (cateUser.U_CATE_DEPT === 2) {
+      const data = await userModel.selectProgByCode(cateUser.U_CATE_PCD);
+      if (!list.find((ls) => ls.group_code === data.U_CATE_CODE)) {
+        let group_items = []
+        if(listSub.find((su) => su.parent === data.U_CATE_CODE)){
+           group_items = arrMerge
+          .filter((cu) => cu.U_CATE_PCD === data.U_CATE_CODE)
+          .map(function (cate) {
+            return {
+              code: cate.U_CATE_CODE,
+              route: cate.URL,
+              sort2: cate.SORT_ORDER,
+              parent: cate.U_CATE_PCD,
+              name: {
+                vn: cate.U_CATE_NAME,
+                en: cate.U_CATE_NAME_EN,
+                kr: cate.U_CATE_NAME_KR,
               },
-              items: {}
+              sub_items: listSub.filter((su) => su.parent === data.U_CATE_CODE),
             };
-          // }
-
-          // gán độ sâu 1
-          // if (list[row1.U_CATE_CODE].items[row2.U_CATE_CODE] == undefined) {
-            list[row1.U_CATE_CODE].items[row2.U_CATE_CODE] = {
-              code: row2.U_CATE_CODE,
-              names: {
-                vn: row2.U_CATE_NAME,
-                en: row2.U_CATE_NAME_EN,
-                kr: row2.U_CATE_NAME_KR,
+          });
+        }else{
+           group_items = arrMerge
+          .filter((cu) => cu.U_CATE_PCD === data.U_CATE_CODE)
+          .map(function (cate) {
+            return {
+              code: cate.U_CATE_CODE,
+              route: cate.URL,
+              sort2: cate.SORT_ORDER,
+              parent: cate.U_CATE_PCD,
+              name: {
+                vn: cate.U_CATE_NAME,
+                en: cate.U_CATE_NAME_EN,
+                kr: cate.U_CATE_NAME_KR,
               },
-              items: {},
             };
-          // }
-
-          // gán độ sâu 2
-          // if (
-          //   list[row1.U_CATE_CODE].items[row2.U_CATE_CODE].items[
-          //     r.U_CATE_CODE
-          //   ] == undefined
-          // ) {
-            list[row1.U_CATE_CODE].items[row2.U_CATE_CODE].items[
-              r.U_CATE_CODE
-            ] = {
-              code: r.U_CATE_CODE,
-              names: {
-                vn: r.U_CATE_NAME,
-                en: r.U_CATE_NAME_EN,
-                kr: r.U_CATE_NAME_KR,
-              },
-              chk_flag: r.HAS_PER,
-            };
-          // }
+          });
         }
       
-    } else if (r.U_CATE_DEPT === 2) {
-      // nếu độ sâu phân lớp là 2
-      if (!(r.U_CATE_PCD in cate_lv1)) {
-        // Khóa không tồn tại trong cate_lv1
-        r1 = await userModel.selectProgByCode(r.U_CATE_PCD);
-        if (r1) {
-          cate_lv1[r1.U_CATE_PCD] = r1;
-        }
-      } else {
-        // Khóa  tồn tại trong cate_lv2
-        r1 = cate_lv1[r.U_CATE_PCD];
+        list.push({
+          group_code: data.U_CATE_CODE,
+          group_route: data.URL,
+          group_sort: data.SORT_ORDER,
+          group_names: {
+            vn: data.U_CATE_NAME,
+            en: data.U_CATE_NAME_EN,
+            kr: data.U_CATE_NAME_KR,
+          },
+          group_items: group_items,
+        });
       }
-      // if ( list[r1.U_CATE_CODE] !== undefined || list[r1.U_CATE_CODE] !== null) {
-        //kiểm tra khác undefined ko
-        list[r1.U_CATE_CODE] = {
-          code: r1.U_CATE_CODE,
-          names: {
-            vn: r1.U_CATE_NAME,
-            en: r1.U_CATE_NAME_EN,
-            kr: r1.U_CATE_NAME_KR,
-          },
-          items: {}
-        };
-      // }
-      // gán độ sâu 1
-      // if (list[r1.U_CATE_CODE].items[r.U_CATE_CODE] == undefined) {
-        list[r1.U_CATE_CODE].items[r.U_CATE_CODE] = {
-          code: r.U_CATE_CODE,
-          names: {
-            vn: r.U_CATE_NAME,
-            en: r.U_CATE_NAME_EN,
-            kr: r.U_CATE_NAME_KR,
-          },
-          chk_flag: r.HAS_PER,
-        };
-      // }
-    } else if (r.U_CATE_DEPT === 1) {
-      // nếu độ sâu phân lớp là 1
-      console.log('1')
-      list[r.U_CATE_CODE] = {
-        code: r.U_CATE_CODE,
-        names: {
-          vn: r.U_CATE_NAME,
-          en: r.U_CATE_NAME_EN,
-          kr: r.U_CATE_NAME_KR,
-        },
-        chk_flag: r.HAS_PER,
-      };
     }
-    // console.log('r ',r.U_CATE_DEPT)
-
   }
-
-  list_progs = [];
-  let a = b = c = 0;
+  //lấy danh sách chính và merge với danh sách sub
+  console.timeEnd('MERGE')
 
   return list;
 }

@@ -75,7 +75,7 @@ module.exports = class userModel {
                `;
          }
     
-      // logger.writeLog("info", `${logBase} : ${sql}`);
+      logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);
       return rows
     } catch (error) {
@@ -93,7 +93,7 @@ module.exports = class userModel {
         JOIN TBL_MOA_USERS_LEVEL AS UL ON UL.U_LEVEL_CODE = ULP.U_LEVEL_CODE
         JOIN TBL_MOA_USERS_CATE AS UC ON UC.U_CATE_CODE = ULP.U_CATE_CODE
     WHERE
-        ULP.U_LEVEL_CODE = '${level_id}' `;
+        ULP.U_LEVEL_CODE = '${level_id}'  ORDER BY UC.SORT_ORDER ASC`;
     
       // logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);

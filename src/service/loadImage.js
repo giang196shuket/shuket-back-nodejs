@@ -6,8 +6,9 @@ module.exports = {
 
     const configs = configAws.upload;
 
-    const result = `${configs.s3_domain}/${configs.s3_bucket}/${config_name}/${images}`;
 
+    const result = `${configs.s3_domain}/${configs.s3_bucket}/${config_name}/${images}`;
+ 
     return result;
   },
 };
