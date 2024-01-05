@@ -3,13 +3,22 @@ const logger = require("../../config/logger");
 const moment = require("moment");
 const { password_verify } = require("../service/auth");
 
-module.exports = class martModel {
+module.exports = class saleCollectionModel {
+  static async moaSelectMarts(
+    limit,
+    page,
+    appType,
+    keywordType,
+    keywordValue,
+    martUseSyncOrder,
+    martWithStock,
+    status,
+    offset
+  ) {
+    let logBase = `models/saleCollectionModel.moaSelectMarts: `;
 
-  static async moaSelectMarts(limit,page, appType, keywordType, keywordValue, martUseSyncOrder, martWithStock, status, offset) {
-    let logBase = `models/mainModel.moaSelectMarts: `;
-      
-      try {
-        let  sql = ` SELECT
+    try {
+      let sql = ` SELECT
         MB.SEQ AS MART_SEQ, MB.SP_CODE, MB.SPT_CODE, MB.M_MOA_CODE, MC.M_POS_REGCODE, MB.M_NAME AS MART_NAME, MB.M_DISTRICT AS DISTRICT_NAME, MB.C_TIME,
         '0' AS SUBSCR_CNT,
         '0' AS SUBSCR_PAYMENT,
@@ -52,55 +61,54 @@ module.exports = class martModel {
             GROUP BY
                 MCAD.DT_CODE, MCAD.DT_NAME_EN, MCAD.DT_NAME_KR
         ) AS MCAD ON MB.DT_CODE = MCAD.DT_CODE `;
-        let whereStr = " WHERE 1=1 "
-    if (appType) {
+      let whereStr = " WHERE 1=1 ";
+      if (appType) {
         whereStr += ` AND MC.M_APP_TYPE = '${appType}' `;
-    }
-    if(keywordType && keywordValue){
-        if (keywordType == 'mart_name') {
-            whereStr += ` AND MB.M_NAME LIKE '%${keywordValue}%' `;
+      }
+      if (keywordType && keywordValue) {
+        if (keywordType == "mart_name") {
+          whereStr += ` AND MB.M_NAME LIKE '%${keywordValue}%' `;
         }
-        if (keywordType == 'mart_code') {
-            whereStr += ` AND MB.M_MOA_CODE LIKE '%${keywordValue}%' `;
+        if (keywordType == "mart_code") {
+          whereStr += ` AND MB.M_MOA_CODE LIKE '%${keywordValue}%' `;
         }
-        if (keywordType == 'mart_p_regcode') {
-            whereStr += ` AND MB.M_POS_REGCODE LIKE '%${keywordValue}%' `;
+        if (keywordType == "mart_p_regcode") {
+          whereStr += ` AND MB.M_POS_REGCODE LIKE '%${keywordValue}%' `;
         }
-        if (keywordType == 'mart_hq_code') {
-            whereStr += ` AND MB.M_HQ_CODE LIKE '%${keywordValue}%' `;
+        if (keywordType == "mart_hq_code") {
+          whereStr += ` AND MB.M_HQ_CODE LIKE '%${keywordValue}%' `;
         }
-        if (keywordType == 'mart_seq') {
-            whereStr += ` AND MB.M_HQ_CODE LIKE '%${keywordValue}%' `;
+        if (keywordType == "mart_seq") {
+          whereStr += ` AND MB.M_HQ_CODE LIKE '%${keywordValue}%' `;
         }
-    }
-    if (status) {
+      }
+      if (status) {
         whereStr += ` AND MB.M_STATUS = '${status}' `;
-    } else {
+      } else {
         whereStr += " AND MB.M_STATUS = 'A' ";
-    }
-    if(martUseSyncOrder === true || martUseSyncOrder === 1){
+      }
+      if (martUseSyncOrder === true || martUseSyncOrder === 1) {
         whereStr += ` AND MC.USE_TDC_ORDER = 'Y' `;
-    }
-    if(martWithStock === true || martWithStock === 1){
+      }
+      if (martWithStock === true || martWithStock === 1) {
         whereStr += ` AND MC.IS_STOCK = 'Y' AND MC.IS_STOP_STOCK = 'N' `;
-    }
+      }
 
-    sql += whereStr + ' ORDER BY MB.SEQ DESC '
-    if (offset && limit) {
-        sql += ' LIMIT ' + offset + ',' + limit;
-    }
-    console.log(sql)
-  
+      sql += whereStr + " ORDER BY MB.SEQ DESC ";
+      if (offset && limit) {
+        sql += " LIMIT " + offset + "," + limit;
+      }
+      console.log(sql);
+
       const [rows] = await pool.mysqlPool.query(sql);
-      return rows
+      return rows;
     } catch (error) {
       logger.writeLog("error", `${logBase} : ${error.stack}`);
-      return null
+      return null;
     }
   }
-  static async selectDetailMart(seq)
-  {
-    let logBase = `models/mainModel.selectDetailMart: `;
+  static async selectDetailMart(seq) {
+    let logBase = `models/saleCollectionModel.selectDetailMart: `;
 
     const sql = ` SELECT
             MB.SEQ, MB.SP_CODE, SP.SP_NAME, MB.SPT_CODE, ST.SPT_NAME, MB.M_HQ_CODE, MB.M_TYPE, MB.M_MOA_CODE, MB.M_LOGO, MB.M_LOGO_PUSH, MB.M_NAME, MB.M_LICENSE, MB.M_PHONE, MB.CT_CODE, MB.DT_CODE, MB.M_ADDRESS,
@@ -124,14 +132,14 @@ module.exports = class martModel {
             LEFT JOIN TBL_SP_BASIC AS SP ON SP.SP_CODE = MB.SP_CODE
             LEFT JOIN TBL_SP_SALES_TEAM AS ST ON ST.SPT_CODE = MB.SPT_CODE
             WHERE MB.SEQ =  ${seq}`;
-            console.log(sql)
+    console.log(sql);
 
     const [rows] = await pool.mysqlPool.query(sql);
-    return rows[0]
+    return rows[0];
   }
   //SK, SG, YSK, GSK
-  static async getTypeWhere(mMoaCode){
-    let logBase = `models/mainModel.getTypeWhere: `;
+  static async getTypeWhere(mMoaCode) {
+    let logBase = `models/saleCollectionModel.getTypeWhere: `;
 
     const sql = `SELECT
     MB.M_HQ_CODE, MB.M_MOA_CODE, MB.M_NAME, MC.M_APP_TYPE
@@ -140,41 +148,52 @@ module.exports = class martModel {
     JOIN TBL_MOA_MART_CONFIG AS MC ON MB.M_MOA_CODE = MC.M_MOA_CODE
     WHERE (MB.M_TYPE = 'F' OR MB.M_TYPE = 'FA' OR MB.M_TYPE = 'FW' OR MB.M_TYPE = 'FB')
     AND MB.M_STATUS = 'A'
-    AND MB.M_HQ_CODE = MB.M_MOA_CODE`
+    AND MB.M_HQ_CODE = MB.M_MOA_CODE`;
     const [rows] = await pool.mysqlPool.query(sql);
-    return rows
+    return rows;
   }
   //SKP BANK CARD KKP NP CCOD COD VBANK
-  static async getListPaymentOfMart(moaCode){
-    let logBase = `models/mainModel.getListPaymentOfMart: `;
+  static async getListPaymentOfMart(moaCode) {
+    let logBase = `models/saleCollectionModel.getListPaymentOfMart: `;
 
     const sql = `SELECT C_CODE, C_KO, C_ENG , ifnull(MMP.IS_USE,'N') AS IS_USE, ifnull(MMP.IS_USE,'yes') AS IS_INSERT
     FROM TBL_MOA_CODE_COMMON AS CCMON
     LEFT JOIN TBL_MOA_MART_PAYMETHOD AS MMP on MMP.M_PM_CODE = CCMON.C_CODE AND MMP.M_MOA_CODE='${moaCode}'
     WHERE CCMON.C_GRP = 'OP' AND CCMON.C_USE = 'Y'
     GROUP BY CCMON.C_CODE
-    ORDER BY CCMON.C_ORDER ASC`
+    ORDER BY CCMON.C_ORDER ASC`;
     const [rows] = await pool.mysqlPool.query(sql);
-    return rows
-  }
- 
- // SHUKET PROJECT, FCM key 3
- static async getAllFcmList()
-  {
-    let logBase = `models/mainModel.getAllFcmList: `;
-
-    const sql = "SELECT FCM_CODE as fcm_code ,FCM_NAME as fcm_name FROM moa_platform.TBL_MOA_FCM_DATA";
-    const [rows] = await pool.mysqlPool.query(sql);
-    return rows      
+    return rows;
   }
 
-  static async getDataConfigCustomMart(mMoaCode)
-  {
-    let logBase = `models/mainModel.getDataConfigCustomMart: mMoaCode:${mMoaCode} `;
+  // SHUKET PROJECT, FCM key 3
+  static async getAllFcmList() {
+    let logBase = `models/saleCollectionModel.getAllFcmList: `;
+
+    const sql =
+      "SELECT FCM_CODE as fcm_code ,FCM_NAME as fcm_name FROM moa_platform.TBL_MOA_FCM_DATA";
+    const [rows] = await pool.mysqlPool.query(sql);
+    return rows;
+  }
+
+  static async getDataConfigCustomMart(mMoaCode) {
+    let logBase = `models/saleCollectionModel.getDataConfigCustomMart: mMoaCode:${mMoaCode} `;
 
     const sql = `SELECT M_MOA_CODE, DATA_CONFIG FROM TBL_MOA_MART_CONFIG_CUSTOM WHERE TYPE = 'RCT' AND STATUS = 'A' AND M_MOA_CODE = '${mMoaCode}'`;
     const [rows] = await pool.mysqlPool.query(sql);
-    return rows[0]      
+    return rows[0];
   }
- 
+  static async getMartCommonWhere() {
+    let logBase = `models/saleCollectionModel.getMartCommonWhere:`;
+
+    const sql = `SELECT
+    C_CODE, C_KO, C_ENG
+    FROM
+    TBL_MOA_CODE_COMMON
+    WHERE C_GRP = 'DB'
+    AND C_USE = 'Y'
+    ORDER BY C_ORDER ASC`;
+    const [rows] = await pool.mysqlPool.query(sql);
+    return rows;
+  }
 };

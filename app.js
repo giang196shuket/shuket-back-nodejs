@@ -12,7 +12,9 @@ const createError = require("http-errors");
 //get router
 const authRouter = require("./src/router/auth");
 const mainRouter = require("./src/router/main");
-const martRouter = require("./src/router/mart");
+const saleCollecRouter = require("./src/router/saleCollection");
+const posRouter = require("./src/router/pos");
+const partRouter = require("./src/router/partner");
 
 const app = express();
 dotenv.config({ path: `${appRoot}/config/config.env` });
@@ -35,6 +37,8 @@ app.use(function (req, res, next) {
 //use router
 app.use("/auth", authRouter);
 app.use("/main", mainRouter);
-app.use("/sales_collection", martRouter);
+app.use("/sales_collection", saleCollecRouter);
+app.use("/pos", posRouter)
+app.use("/partner", partRouter)
 
 module.exports = app;

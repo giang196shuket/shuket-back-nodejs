@@ -66,4 +66,54 @@ module.exports = class mainModel {
       return null
     }
   }
+  static async getTypeMart() {
+    let logBase = `models/mainModel.getTypeMart:`;
+      try {
+        const  sql = `SELECT CA.C_CODE, CA.C_ENG AS NAME_EN, CA.C_KO AS NAME_KR
+        FROM TBL_MOA_CODE_COMMON CA
+  WHERE C_GRP = 'AT' AND C_USE = 'Y'
+        GROUP BY CA.C_CODE
+        ORDER BY C_CODE ASC`;
+
+      const [rows] = await pool.mysqlPool.query(sql);
+      return rows
+    } catch (error) {
+      logger.writeLog("error", `${logBase} : ${error.stack}`);
+      return null
+    }
+  }
+  static async getCityOptions() {
+    let logBase = `models/mainModel.getCityOptions:`;
+      try {
+        const  sql = ` SELECT
+        CA.CT_CODE, CA.CT_NAME_EN AS CT_NAME_EN, CA.CT_NAME_KR AS CT_NAME_KR
+    FROM
+        TBL_MOA_CODE_AREA CA
+    GROUP BY CA.CT_CODE
+    ORDER BY CT_NAME_KR ASC`;
+
+      const [rows] = await pool.mysqlPool.query(sql);
+      return rows
+    } catch (error) {
+      logger.writeLog("error", `${logBase} : ${error.stack}`);
+      return null
+    }
+  }
+  static async getDistrictOptions(ctCode) {
+    let logBase = `models/mainModel.getCityOptions: ctCode: ${ctCode}`;
+      try {
+        const  sql = `  SELECT
+        CA.DT_CODE, CA.DT_NAME_EN, CA.DT_NAME_KR
+    FROM
+        TBL_MOA_CODE_AREA CA WHERE CA.CT_CODE = '${ctCode}'  ORDER BY CA.DT_NAME_KR ASC`;
+
+      const [rows] = await pool.mysqlPool.query(sql);
+      return rows
+    } catch (error) {
+      logger.writeLog("error", `${logBase} : ${error.stack}`);
+      return null
+    }
+  }
+  
+ 
 };
