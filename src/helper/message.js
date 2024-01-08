@@ -7,6 +7,7 @@
    PwNotEmpty: 'The password field can not empty',
    TokenInvalid: "Invalid login token.",
    TokenEmpty : "The token field can not empty",
+   TokenExpried:"Login token expired",
    ErrorServer: 'Error server',
    IdNotValid : 'The ID you entered is not valid',
    InvalidPassword:'Invalid password. Please try again',
