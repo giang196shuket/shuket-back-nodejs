@@ -58,4 +58,15 @@ module.exports = class authModel {
       return { status: false, msg: error.stack };
     }
   }
+  static async getListAccountSwitch()
+  {
+    const sql =
+      `SELECT
+				M_MOA_CODE as user_acc,
+				M_NAME as user_name
+			FROM TBL_MOA_MART_BASIC MART_BASIC
+			WHERE MART_BASIC.M_STATUS='A' `;
+    const [rows] = await pool.mysqlPool.query(sql);
+    return rows;
+  }
 };

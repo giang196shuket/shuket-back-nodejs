@@ -3,6 +3,7 @@
 }
 
  const messageError = {
+   sendNotificationSucess : 'Send notification success',
    IdNotEmpty:'The id field can not empty',
    PwNotEmpty: 'The password field can not empty',
    TokenInvalid: "Invalid login token.",

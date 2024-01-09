@@ -31,7 +31,7 @@ module.exports = {
             return  res.status(200).json(responseErrorInput(errors));
         }
 
-        if(id.length > 40){
+        if(id && id.length > 40){
             //602
             return  res.status(200).json({
                 status:'failure',
@@ -43,7 +43,7 @@ module.exports = {
             });
         }
 
-        if(password.length > 60){
+        if(password && password.length > 60){
             //602
             return  res.status(200).json({
                 status:'failure',

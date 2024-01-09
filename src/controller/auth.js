@@ -47,4 +47,10 @@ module.exports = {
          
     },
 
+    async getListAccountSwitch (req,res, next){
+        const  data = await authModel.getListAccountSwitch()
+        return  res.status(200).json(responseSuccess(200,  messageSuccess.Success, data));
+
+    }
+
 }
