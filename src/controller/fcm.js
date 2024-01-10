@@ -42,29 +42,7 @@ module.exports = {
       });
   
   },
-  async postNotificationSchedule(req, res, next) {
-    const admin =  req.body.FCM === 'FCM0000001' ? adminFCM1 : adminFCM2
-
-    const data = {
-      data:  {...req.body.message, sendBy: req.body.FCM},
-      token: req.body.NT_DEVC_TOKEN
-    };
-
-    admin.messaging().send(data)
-      .then((response) => {
-        return res
-        .status(200)
-        .json(responseSuccess(200, messageSuccess.Success, messageSuccess.Success));
-      })
-      .catch((error) => {
-        return res
-        .status(200)
-        .json(responseSuccess(500, messageError.ErrorServer,  error));
-      });
   
-  },
-  
-
   
   async postNotificationByTopic(req, res, next) {
     const admin =  req.body.FCM === 'FCM0000001' ? adminFCM1 : adminFCM2

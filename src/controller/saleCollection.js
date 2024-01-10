@@ -1,10 +1,13 @@
 const { messageError, messageSuccess } = require("../helper/message");
-const { responseSuccess, responseErrorData } = require("../helper/response");
+const { responseSuccess, responseErrorData, responseErrorInput } = require("../helper/response");
 const userModel = require("../model/user");
 const { mergeRoleList } = require("../helper/funtion");
 const saleCollectionModel = require("../model/saleCollection");
 const moment = require("moment");
 const { loadImageAws } = require("../service/loadImage");
+const { s3 } = require("../service/upload");
+const  {getSize, getNameMartLogo}  = require("../helper/upload");
+
 
 module.exports = {
   async moaSearchList(req, res, next) {
@@ -391,15 +394,57 @@ module.exports = {
   },
 
   async getMartCommonWhere(req, res, next) {
-    const data = await saleCollectionModel.getMartCommonWhere()
+    const data = await saleCollectionModel.getMartCommonWhere();
     const listDBPos = await data.map((item) => ({
       moa_common_code: item.C_CODE,
       moa_common_name_ko: item.C_KO,
-      moa_common_name_en: item.C_ENG
+      moa_common_name_en: item.C_ENG,
     }));
-    const dataResponse = listDBPos
+    const dataResponse = listDBPos;
     return res
-    .status(200)
-    .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+
+  async uploadMartLogo(req, res, next) {
+    if (req.multerError) {
+      return res
+      .status(500)
+      .json(responseErrorInput(req.multerError));
+  }
+    const file = req.file;
+    const newNameFile = getNameMartLogo()
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: "mart/logo/" + newNameFile,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
+
+    try {
+      await s3.upload(params).promise();
+      s3.upload(params, async (error, data) => {
+        if (error) {
+          return res
+            .status(500)
+            .json(responseErrorInput( error));
+        } else {
+          const dimension = await getSize(req.file.buffer)
+          const dataResponse = {
+            image_name: newNameFile,
+            image_url: data.Location,
+            width: dimension && dimension.width,
+            height: dimension && dimension.height,
+          };
+          return res
+            .status(200)
+            .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+        }
+      });
+    } catch (error) {
+      return res
+            .status(500)
+            .json(responseErrorInput( error));
+    }
   },
 };

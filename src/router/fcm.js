@@ -10,7 +10,6 @@ router.post("/post_notification",  middleware.verifyToken, controller.postNotifi
 router.post("/post_notification_by_topic",  middleware.verifyToken, controller.postNotificationByTopic);
 router.post("/subcribe_topic",  middleware.verifyToken, controller.subcribeTopic);
 router.post("/unsubcribe_topic",  middleware.verifyToken, controller.unsubcribeTopic);
-router.post("/post_notification_schedule",  middleware.verifyToken, controller.postNotificationSchedule);
 
 
 module.exports = router;
