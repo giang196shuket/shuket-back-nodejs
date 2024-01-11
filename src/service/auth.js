@@ -39,18 +39,19 @@ module.exports = {
   },
   async generateToken(userData, userAgent) {
     const logBase = 'helper/auth/generateToken';
+    console.log(userData)
     try {
         let token_data = {
-          user_id : userData.data.user_id,
-          u_martid : userData.data.u_martid,
-          u_phone : userData.data.u_phone ? userData.data.u_phone : '',
-          u_email : userData.data.u_email ? userData.data.u_email : '',
-          level_id : userData.data.u_level,
-          ctime : userData.data.ctime,
-          is_change : userData.data.is_change,
-          old_userid : userData.data.old_userid,
-          old_martid : userData.data.old_martid,
-          old_ulevel : userData.data.old_ulevel,
+          user_id : userData.user_id,
+          u_martid : userData.u_martid,
+          u_phone : userData.u_phone ? userData.u_phone : '',
+          u_email : userData.u_email ? userData.u_email : '',
+          level_id : userData.u_level,
+          ctime : userData.ctime,
+          is_change : userData.is_change,
+          old_userid : userData.old_userid,
+          old_martid : userData.old_martid,
+          old_ulevel : userData.old_ulevel,
           user_agent : userAgent,
           user_ip : ip.address(),
           time:  parseInt((new Date().getTime() + jwt_expires).toString().slice(0,10))

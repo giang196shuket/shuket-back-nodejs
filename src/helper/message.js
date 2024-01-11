@@ -3,6 +3,7 @@
 }
 
  const messageError = {
+   uploadFailed: "Upload failed",
    mimetypeNotValid: "File mimetype not valid",
    sendNotificationSucess : 'Send notification success',
    IdNotEmpty:'The id field can not empty',

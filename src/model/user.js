@@ -8,10 +8,10 @@ module.exports = class userModel {
   static async selectProgsRoleByUser(user, is_null = false) {
     let logBase = `models/userModel.selectProgsRoleByUser:  user(${user})`;
       try {
-        if (!user.level_id || !user.user_id) {
-            return null;
-          }
-          const level_id = user.level_id;
+        // if (!user.level_id || !user.user_id) {
+        //     return null;
+        //   }
+          const level_id = user.level_id ? user.level_id : user.old_ulevel;
           const user_id = user.user_id;
           const is_change = user.is_change || 0;
           const old_userid = user.old_userid || null;

@@ -15,7 +15,7 @@ module.exports = {
 
         if(result.status){
  
-           let token =  await generateToken(result, req.headers['user-agent'])
+           let token =  await generateToken(result.data, req.headers['user-agent'])
 
            var data = {
                 token: token,
@@ -46,7 +46,46 @@ module.exports = {
 
          
     },
+    async userSwitchAccount (req,res, next){
+        const id = req.params.id;
+        const user = req.userInfo
+        const token = await generateToken({...user, is_change : 1, u_level: 301, u_martid: id}, req.headers['user-agent'])
+        const dataResponse = {
+            token: token,
+            user_id: user.user_id,
+            martid : req.params.id,
+            name: user.u_name ? user.u_name : '',
+            phone: user.u_phone,
+            email: user.u_email,
+            level: 301,
+            menu_list: null,
+            role_list: null
+        }
 
+        return  res.status(200).json(responseSuccess(200,  messageSuccess.Success, dataResponse));
+
+
+    },
+    async resetAccount(req, res, next){
+        const user = req.userInfo
+        console.log('user', user)
+            const token = await generateToken({...user, is_change : 0}, req.headers['user-agent'])
+
+            const dataResponse = {
+                token: token,
+                user_id: user.user_id,
+                martid : user.old_martid,
+                name: user.u_name ? user.u_name : '',
+                phone: user.u_phone,
+                email: user.u_email,
+                level: user.old_ulevel,
+                menu_list: null,
+                role_list: null
+            }
+        
+        return  res.status(200).json(responseSuccess(200,  messageSuccess.Success,  dataResponse));
+
+    },
     async getListAccountSwitch (req,res, next){
         const  data = await authModel.getListAccountSwitch()
         return  res.status(200).json(responseSuccess(200,  messageSuccess.Success, data));

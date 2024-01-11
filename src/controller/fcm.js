@@ -6,6 +6,36 @@ const {  adminFCM1, adminFCM2 } = require("../service/fcm");
 
 module.exports = {
 
+  async fcmList (req, res, next) {
+    let { page, limit} = req.body
+    page = page ? page : 1
+    limit = limit ? limit : 10
+    const offset = page * limit -  limit
+    const rows = await fcmModel.fcmList( offset, limit)
+    let list = []
+    let i = 1
+  
+    rows.forEach(row => {
+      list.push({
+        number_order : i,
+        fcm_seq : row.SEQ,
+        fcm_code : row.FCM_CODE,
+        fcm_name : row.FCM_NAME,
+        fcm_registerdate: row.C_TIME
+      })
+      i++
+    });
+    const dataResponse = {
+      page_index : page,
+      page_size: limit,
+      page_count: Math.ceil(rows.length / limit),
+      search_count: rows.length,
+      fcm_list: list
+    }
+    return res
+    .status(200)
+    .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
   async getFcmOptions(req, res, next) {
     const data = await fcmModel.getFcmOptions()
     const listFcm = await data.map((item) => ({

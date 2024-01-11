@@ -4,6 +4,7 @@ const  middleware  = require("../middleware/auth");
 
 var router = express.Router();
 
+router.post("/fcm_list",  middleware.verifyToken, controller.fcmList);
 
 router.get("/get_fcm_options",  middleware.verifyToken, controller.getFcmOptions);
 router.post("/post_notification",  middleware.verifyToken, controller.postNotification);

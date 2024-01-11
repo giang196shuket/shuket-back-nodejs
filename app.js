@@ -16,7 +16,7 @@ const saleCollecRouter = require("./src/router/saleCollection");
 const posRouter = require("./src/router/pos");
 const partRouter = require("./src/router/partner");
 const fcmRouter = require("./src/router/fcm");
-const productRouter = require("./src/router/product");
+const importRouter = require("./src/router/import");
 
 const app = express();
 dotenv.config({ path: `${appRoot}/config/config.env` });
@@ -44,7 +44,7 @@ app.use("/sales_collection", saleCollecRouter);
 app.use("/pos", posRouter)
 app.use("/partner", partRouter)
 app.use("/fcm", fcmRouter)
-app.use("/product", productRouter)
+app.use("/import", importRouter)
 
 
 module.exports = app;
