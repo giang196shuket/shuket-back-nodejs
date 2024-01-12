@@ -17,6 +17,7 @@ const posRouter = require("./src/router/pos");
 const partRouter = require("./src/router/partner");
 const fcmRouter = require("./src/router/fcm");
 const importRouter = require("./src/router/import");
+const appBuilderRouter = require("./src/router/appBuilder");
 
 const app = express();
 dotenv.config({ path: `${appRoot}/config/config.env` });
@@ -45,6 +46,7 @@ app.use("/pos", posRouter)
 app.use("/partner", partRouter)
 app.use("/fcm", fcmRouter)
 app.use("/import", importRouter)
+app.use("/appbuilder", appBuilderRouter)
 
 
 module.exports = app;
