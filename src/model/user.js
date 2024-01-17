@@ -103,6 +103,45 @@ module.exports = class userModel {
       return null
     }
   }
+  static async getMenuByUser(user){
+    let logBase = `models/userModel.getMenuByUser`;
+    try {
+      //is_change admin dùng mart đăng nhập
+      let sql = ""
+      if(user.u_martid && user.is_change === 0){
+        sql =   `SELECT UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE,
+        UC.SORT_ORDER
+        FROM TBL_MOA_USERS_CATE AS UC
+        LEFT JOIN TBL_MOA_USERS_PGRM AS UP ON UP.U_CATE_CODE = UC.U_CATE_CODE AND UP.U_ID = '${user.user_id}'
+        WHERE UC.IS_USE = 'T'  AND UC.U_CATE_CODE>=30000 
+        AND (case when UC.U_CATE_DEPT=3 AND (UC.URL is null OR UC.URL='') then '' else 'aa' end) !=''
+        ORDER BY  UC.U_CATE_DEPT asc, UC.SORT_ORDER  ASC`
+      }else if (user.u_martid && user.is_change === 1){
+        sql = `SELECT UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE,
+          UC.SORT_ORDER
+          FROM TBL_MOA_USERS_CATE AS UC
+          LEFT JOIN TBL_MOA_USERS_PGRM AS UP ON UP.U_CATE_CODE = UC.U_CATE_CODE AND UP.U_ID = '${user.user_id}'
+          WHERE UC.IS_USE = 'T' AND UC.U_CATE_CODE>=10000
+          AND (case when UC.U_CATE_DEPT=3 AND (UC.URL is null OR UC.URL='') then '' else 'aa' end) !=''
+          ORDER BY  UC.U_CATE_DEPT asc, UC.SORT_ORDER  ASC`
+      }else if (!user.u_martid){
+        sql = `SELECT UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE,
+           UC.SORT_ORDER
+           FROM TBL_MOA_USERS_CATE AS UC
+           LEFT JOIN TBL_MOA_USERS_PGRM AS UP ON UP.U_CATE_CODE = UC.U_CATE_CODE AND UP.U_ID = '${user.user_id}'
+           WHERE UC.IS_USE = 'T'  AND UC.U_CATE_CODE < 30000 AND UC.U_CATE_CODE>=10000
+           AND (case when UC.U_CATE_DEPT=3 AND (UC.URL is null OR UC.URL='') then '' else 'aa' end) !=''
+           ORDER BY  UC.U_CATE_DEPT asc, UC.SORT_ORDER  ASC`
+      }
+ 
+  
+    const [rows] = await pool.mysqlPool.query(sql);
+    return rows
+  } catch (error) {
+    logger.writeLog("error", `${logBase} : ${error.stack}`);
+    return null
+  }
+  }
   static async selectProgByCode(cate_code) {
     let logBase = `models/userModel.selectProgByCode: cate_code(${cate_code})`;
       try {

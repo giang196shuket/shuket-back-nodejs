@@ -1,7 +1,7 @@
 var express = require("express");
-const  controller  = require("../controller/saleCollection");
+const  controller  = require("../controller/mart/mart");
 const  middleware  = require("../middleware/auth");
-const { upload } = require("../service/upload");
+const { upload } = require("../service/uploadS3");
 
 var router = express.Router();
 

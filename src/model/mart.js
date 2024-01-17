@@ -3,7 +3,7 @@ const logger = require("../../config/logger");
 const moment = require("moment");
 const { password_verify } = require("../service/auth");
 
-module.exports = class saleCollectionModel {
+module.exports = class martModel {
   static async moaSelectMarts(
     limit,
     page,
@@ -15,7 +15,7 @@ module.exports = class saleCollectionModel {
     status,
     offset
   ) {
-    let logBase = `models/saleCollectionModel.moaSelectMarts: `;
+    let logBase = `models/martModel.moaSelectMarts: `;
 
     try {
       let sql = ` SELECT
@@ -108,7 +108,7 @@ module.exports = class saleCollectionModel {
     }
   }
   static async selectDetailMart(seq) {
-    let logBase = `models/saleCollectionModel.selectDetailMart: `;
+    let logBase = `models/martModel.selectDetailMart: `;
 
     const sql = ` SELECT
             MB.SEQ, MB.SP_CODE, SP.SP_NAME, MB.SPT_CODE, ST.SPT_NAME, MB.M_HQ_CODE, MB.M_TYPE, MB.M_MOA_CODE, MB.M_LOGO, MB.M_LOGO_PUSH, MB.M_NAME, MB.M_LICENSE, MB.M_PHONE, MB.CT_CODE, MB.DT_CODE, MB.M_ADDRESS,
@@ -139,7 +139,7 @@ module.exports = class saleCollectionModel {
   }
   //SK, SG, YSK, GSK
   static async getTypeWhere(mMoaCode) {
-    let logBase = `models/saleCollectionModel.getTypeWhere: `;
+    let logBase = `models/martModel.getTypeWhere: `;
 
     const sql = `SELECT
     MB.M_HQ_CODE, MB.M_MOA_CODE, MB.M_NAME, MC.M_APP_TYPE
@@ -154,7 +154,7 @@ module.exports = class saleCollectionModel {
   }
   //SKP BANK CARD KKP NP CCOD COD VBANK
   static async getListPaymentOfMart(moaCode) {
-    let logBase = `models/saleCollectionModel.getListPaymentOfMart: `;
+    let logBase = `models/martModel.getListPaymentOfMart: `;
 
     const sql = `SELECT C_CODE, C_KO, C_ENG , ifnull(MMP.IS_USE,'N') AS IS_USE, ifnull(MMP.IS_USE,'yes') AS IS_INSERT
     FROM TBL_MOA_CODE_COMMON AS CCMON
@@ -168,7 +168,7 @@ module.exports = class saleCollectionModel {
 
   // SHUKET PROJECT, FCM key 3
   static async getAllFcmList() {
-    let logBase = `models/saleCollectionModel.getAllFcmList: `;
+    let logBase = `models/martModel.getAllFcmList: `;
 
     const sql =
       "SELECT FCM_CODE as fcm_code ,FCM_NAME as fcm_name FROM moa_platform.TBL_MOA_FCM_DATA";
@@ -177,14 +177,14 @@ module.exports = class saleCollectionModel {
   }
 
   static async getDataConfigCustomMart(mMoaCode) {
-    let logBase = `models/saleCollectionModel.getDataConfigCustomMart: mMoaCode:${mMoaCode} `;
+    let logBase = `models/martModel.getDataConfigCustomMart: mMoaCode:${mMoaCode} `;
 
     const sql = `SELECT M_MOA_CODE, DATA_CONFIG FROM TBL_MOA_MART_CONFIG_CUSTOM WHERE TYPE = 'RCT' AND STATUS = 'A' AND M_MOA_CODE = '${mMoaCode}'`;
     const [rows] = await pool.mysqlPool.query(sql);
     return rows[0];
   }
   static async getMartCommonWhere() {
-    let logBase = `models/saleCollectionModel.getMartCommonWhere:`;
+    let logBase = `models/martModel.getMartCommonWhere:`;
 
     const sql = `SELECT
     C_CODE, C_KO, C_ENG

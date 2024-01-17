@@ -1,17 +1,16 @@
-const { messageError, messageSuccess } = require("../helper/message");
-const { responseSuccess, responseErrorData, responseErrorInput } = require("../helper/response");
-const userModel = require("../model/user");
-const { mergeRoleList } = require("../helper/funtion");
-const saleCollectionModel = require("../model/saleCollection");
+const { messageError, messageSuccess } = require("../../helper/message");
+const { responseSuccess, responseErrorData, responseErrorInput } = require("../../helper/response");
+const userModel = require("../../model/user");
+const martModel = require("../../model/mart");
 const moment = require("moment");
-const { loadImageAws } = require("../service/loadImage");
-const { s3 } = require("../service/upload");
-const  {getSize, getNameMartLogo}  = require("../helper/upload");
+const { loadImageAws } = require("../../service/loadImage");
+const { s3 } = require("../../service/uploadS3");
+const  {getSize, getNameMartLogo}  = require("../../helper/upload");
 
 
 module.exports = {
   async moaSearchList(req, res, next) {
-    const logBase = `controller/saleCollection/moaSearchList: `;
+    const logBase = `controller/mart/moaSearchList: `;
     const {
       limit,
       page,
@@ -23,7 +22,7 @@ module.exports = {
       status,
     } = req.body;
     const offset = page * limit - limit;
-    const data = await saleCollectionModel.moaSelectMarts(
+    const data = await martModel.moaSelectMarts(
       limit,
       page,
       app_type,
@@ -110,7 +109,7 @@ module.exports = {
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
   async getDetailMart(req, res, next) {
-    const logBase = `controller/saleCollection/getDetailMart: `;
+    const logBase = `controller/mart/getDetailMart: `;
     const martSeq = req.query.mart_seq;
 
     const activitySummary = {
@@ -132,8 +131,8 @@ module.exports = {
     };
     const arraySingle = ["SA", "SW", "SB"];
     const arrayAnotherApp = ["FA", "FW", "FB"];
-    const row = await saleCollectionModel.selectDetailMart(martSeq);
-    const getType = await saleCollectionModel.getTypeWhere(row.M_MOA_CODE);
+    const row = await martModel.selectDetailMart(martSeq);
+    const getType = await martModel.getTypeWhere(row.M_MOA_CODE);
     let listMartType = [];
     getType.forEach((val) => {
       listMartType.push({
@@ -146,7 +145,7 @@ module.exports = {
 
     //start get info mart payment
 
-    const getListPayment = await saleCollectionModel.getListPaymentOfMart(
+    const getListPayment = await martModel.getListPaymentOfMart(
       row.M_MOA_CODE
     );
 
@@ -358,8 +357,8 @@ module.exports = {
       is_extend_brgn: row.USE_EXTEND_BRGN ? row.USE_EXTEND_BRGN : "N",
     };
 
-    const listFCM = await saleCollectionModel.getAllFcmList();
-    const configCustom = await saleCollectionModel.getDataConfigCustomMart(
+    const listFCM = await martModel.getAllFcmList();
+    const configCustom = await martModel.getDataConfigCustomMart(
       row.M_MOA_CODE
     );
     let receiveOption = "N";
@@ -394,7 +393,7 @@ module.exports = {
   },
 
   async getMartCommonWhere(req, res, next) {
-    const data = await saleCollectionModel.getMartCommonWhere();
+    const data = await martModel.getMartCommonWhere();
     const listDBPos = await data.map((item) => ({
       moa_common_code: item.C_CODE,
       moa_common_name_ko: item.C_KO,

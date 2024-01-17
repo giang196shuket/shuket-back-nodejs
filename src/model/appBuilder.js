@@ -18,7 +18,6 @@ module.exports = class appBuilderModel {
     AND AP.M_MOA_CODE = '${martId}'
     AND AP.T_SC_CODE NOT LIKE '%WS%'
     ORDER BY AP.T_SC_CODE,AP.T_SC_STATUS,IFNULL(AP.T_SC_POSITION, 9999) DESC `;
-      console.log(sql);
 
       const [rows] = await pool.mysqlPool.query(sql);
       return rows;
@@ -43,7 +42,6 @@ module.exports = class appBuilderModel {
     AND AP.T_SC_CODE NOT LIKE '%WS%'
     AND (AE.T_TMPL_SOURCE IS NULL OR AE.T_TMPL_SOURCE !='A') ORDER BY AD.T_SC_DT_TMPL_ORDER ASC`;
 
-      console.log(sql);
       const [rows] = await pool.mysqlPool.query(sql);
       return rows;
     } catch (error) {
@@ -63,7 +61,6 @@ module.exports = class appBuilderModel {
   AND AP.T_SC_STATUS != 'D'
   AND AP.M_MOA_CODE = '${martId}'`;
 
-      console.log(sql);
       const [rows] = await pool.mysqlPool.query(sql);
       return rows[0];
     } catch (error) {
@@ -87,7 +84,6 @@ module.exports = class appBuilderModel {
   AND AP.M_MOA_CODE = '${martId}'  ${where}
   ORDER BY AD.T_SC_DT_TMPL_ORDER ASC `;
 
-      console.log(sql);
       const [rows] = await pool.mysqlPool.query(sql);
       return rows;
     } catch (error) {
