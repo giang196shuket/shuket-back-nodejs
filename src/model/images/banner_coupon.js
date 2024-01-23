@@ -134,6 +134,7 @@ module.exports = class imagesBannerCouponModel {
         await connection.commit();
         return 1
         } catch (error) {
+          await connection.rollback();
           logger.writeLog("error", `${logBase}  \nStacktrace: ${error.stack}`);
           return 0
         } finally{
