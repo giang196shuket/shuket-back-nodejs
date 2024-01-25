@@ -1,62 +1,76 @@
 const { LINK_NO_IMAGE } = require("./link");
 const { messageError } = require("./message");
 
+//làm gọn text
 function stringLimitWords(string, wordLimit) {
-  const words = string?.split(' ').slice(0, wordLimit);
-
+  //wordLimit số lượng từ tối đa của chuỗi trả ra
+  const words = string?.split(" ").slice(0, wordLimit);
   if (words?.length < wordLimit) {
-    // otherwise
-    return words?.join('/');
+    return words?.join("/");
   } else {
-    // add a ... at last article when more than limit word count
     words?.pop();
-    return words?.join(' ') + '...';
+    return words?.join(" ") + "...";
   }
 }
 
- function getLimitQuery(page, perPage)
-{
-  if(!page || page < 1){
-    page =1
-  }
-  if(!perPage || perPage < 1 || perPage > 100){
-    perPage =10
-  }
-
-  const start = (page - 1) * perPage
-
-  return ` LIMIT ${start}, ${perPage}`
-  
-}
-// tạo mảng number ngẫu nhiên từ 1 -> max length : mục dích thay for i => for of
-function generateArray(maxLength) {
-  return Array.from({length: maxLength}, (_, i) => i + 1)
-}
-
-function checkMethod(currentMethod, standalMethod, response){
-  if(currentMethod !== standalMethod){
-    return {code: 405, message:messageError.InvalidMethod} 
+//dùng cho làm gọn content notice
+function limitcontent (content) {
+  if(content.length > 0){
+    return content.substring(0, 70).replace("<p>","").replace("</p>","").concat("...")
   }else{
-    return true
+    return ""
   }
 }
 
-function generateTag(tages) {
-  return tages.map((tag)=> '#'+tag).join('')
+
+//dùng cho query model offset
+function getLimitQuery(page, limit) {
+  if (!page || page < 1) {
+    page = 1;
+  }
+  if (!limit || limit < 1 || limit > 100) {
+    limit = 10;
+  }
+
+  const start = (page - 1) * limit;
+
+  return ` LIMIT ${start}, ${limit}`;
+}
+
+// tạo mảng number ngẫu nhiên từ 1 -> max length : mục dích thay for i => for of
+//EX [1,2,3,4,5,..]
+function generateArray(maxLength) {
+  return Array.from({ length: maxLength }, (_, i) => i + 1);
+}
+
+//check method của router
+function checkMethod(currentMethod, standalMethod, response) {
+  if (currentMethod !== standalMethod) {
+    return { code: 405, message: messageError.InvalidMethod };
+  } else {
+    return true;
+  }
 }
 
 
+//dùng generate tag cho product
+// /tages :[]
+function generateTag(tages) {
+  return tages.map((tag) => "#" + tag).join("");
+}
 
+
+//tạo mảng mới là 1 mảng giá trị của tên phần tử mình cần tìm dựa vào ID
 function arrayColumn(rows, columnName) {
   let result = [];
 
   for (let i = 0; i < rows.length; i++) {
-      if (rows[i][columnName] !== undefined) {
-          result.push(rows[i][columnName]);
-      }
+    if (rows[i][columnName] !== undefined) {
+      result.push(rows[i][columnName]);
+    }
   }
-
   return result;
+
   //EX:
   // rows = [
   //   'ID' : 1, 'P_CODE' : 'ABC'),
@@ -66,17 +80,16 @@ function arrayColumn(rows, columnName) {
   // RESULT: ['ABC', 'DEF', 'GHI'];
 }
 
-
+//tạo ra object mới có giá trị của filed này ứng với field khác
 function arrayColumnAssign(data, columnName, indexName) {
   const result = {};
 
   data.forEach((item) => {
-      const index = item[indexName];
-      const value = item[columnName];
-      // Kiểm tra nếu giá trị chỉ số và giá trị cột không rỗng
-      if (index !== undefined && value !== undefined) {
-          result[index] = value;
-      }
+    const index = item[indexName];
+    const value = item[columnName];
+    if (index !== undefined && value !== undefined) {
+      result[index] = value;
+    }
   });
 
   return result;
@@ -88,5 +101,16 @@ function arrayColumnAssign(data, columnName, indexName) {
   //   C_TIME: 2020-07-28 19:40:03
   //   }]
   //result: {268650080: 3}
+
 }
-module.exports = {  stringLimitWords, getLimitQuery, generateArray, checkMethod, generateTag , arrayColumn, arrayColumnAssign};
+
+module.exports = {
+  stringLimitWords,
+  getLimitQuery,
+  generateArray,
+  checkMethod,
+  generateTag,
+  arrayColumn,
+  arrayColumnAssign,
+  limitcontent
+};

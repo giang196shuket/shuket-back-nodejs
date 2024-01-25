@@ -1,8 +1,8 @@
-const logger = require("../../config/logger");
-const { messageError, messageSuccess } = require("../helper/message");
-const { responseSuccess, responseErrorData } = require("../helper/response");
-const fcmModel = require("../model/fcm");
-const {  adminFCM1, adminFCM2 } = require("../service/fcm");
+const logger = require("../../../config/logger");
+const { messageError, messageSuccess } = require("../../helper/message");
+const { responseSuccess, responseErrorData } = require("../../helper/response");
+const fcmModel = require("../../model/fcm/fcm");
+const {  adminFCM1, adminFCM2 } = require("../../service/fcm");
 
 module.exports = {
 

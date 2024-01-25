@@ -1,19 +1,19 @@
+const { bucketImage } = require("../../../helper/const");
 const { stringLimitWords } = require("../../../helper/funtion");
 const queriesHelper = require("../../../helper/queries");
-const templateViewTenModel = require("../../../model/templateView/teamplate/ten");
+const templateViewTenModel = require("../../../model/appBuilder/teamplate/ten");
 const { loadImageAws } = require("../../../service/loadImage");
 
 module.exports = {
     async  composeTypeTenTemplateData(templateData, martId) {
         let countIndex = 0;
         let templateDataArr = [];
-        const dbConnect = await queriesHelper.getDBconnect(martId);
         for (const val of templateData?.tmpl_data) {
           const actualData = await templateViewTenModel.getTypeTenData(
             val.tmpl_dt_cd,
             val.tmpl_dt_dest_flg,
             martId,
-            dbConnect.M_DB_CONNECT
+            req.dbConnect.M_DB_CONNECT
           );
           if (actualData) {
             let destiTarget = "PCL"; //large
@@ -26,7 +26,7 @@ module.exports = {
               const dataMidCate = templateViewTenModel.getCateMid(
                 actualData.P_CAT_CODE,
                 martId,
-                dbConnect.M_DB_CONNECT
+                req.dbConnect.M_DB_CONNECT
               );
               if (dataMidCate.length > 0) {
                 popupMid = 1;
@@ -38,7 +38,7 @@ module.exports = {
                 contentsID: actualData.T_CATE_CODE,
                 cateName: stringLimitWords(actualData.P_CAT, 4),
                 imageUseFlg: "Y",
-                imageUrl:  await loadImageAws(actualData.T_CATE_IMG_CV, "banner/basic")
+                imageUrl:   loadImageAws(actualData.T_CATE_IMG_CV, bucketImage.banner)
               });
             } else if (
               (actualData.T_CATE_IMG_USE = "D" && actualData.T_CATE_IMG_DATA)

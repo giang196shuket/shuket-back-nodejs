@@ -1,4 +1,5 @@
-const templateViewOneModel = require("../../../model/templateView/teamplate/one");
+const { bucketImage } = require("../../../helper/const");
+const templateViewOneModel = require("../../../model/appBuilder/teamplate/one");
 const { loadImageAws } = require("../../../service/loadImage");
 
 module.exports = {
@@ -31,7 +32,7 @@ module.exports = {
                 }
             }else{
                 templateDataArr = {
-                    img_banner : await loadImageAws(actualData.T_BNR_IMAGE, 'banner/basic'),
+                    img_banner :  loadImageAws(actualData.T_BNR_IMAGE, bucketImage.banner),
                     img_width :  actualData.T_BNR_IMAGE_WD,
                     img_height :actualData.T_BNR_IMAGE_HT
                 }

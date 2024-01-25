@@ -1,7 +1,7 @@
-const pool = require("../../config/database");
-const logger = require("../../config/logger");
+const pool = require("../../../config/database");
+const logger = require("../../../config/logger");
 const moment = require("moment");
-const { password_verify } = require("../service/auth");
+const { password_verify } = require("../../service/auth");
 
 module.exports = class martModel {
   static async moaSelectMarts(
@@ -166,16 +166,6 @@ module.exports = class martModel {
     return rows;
   }
 
-  // SHUKET PROJECT, FCM key 3
-  static async getAllFcmList() {
-    let logBase = `models/martModel.getAllFcmList: `;
-
-    const sql =
-      "SELECT FCM_CODE as fcm_code ,FCM_NAME as fcm_name FROM moa_platform.TBL_MOA_FCM_DATA";
-    const [rows] = await pool.mysqlPool.query(sql);
-    return rows;
-  }
-
   static async getDataConfigCustomMart(mMoaCode) {
     let logBase = `models/martModel.getDataConfigCustomMart: mMoaCode:${mMoaCode} `;
 
@@ -183,16 +173,20 @@ module.exports = class martModel {
     const [rows] = await pool.mysqlPool.query(sql);
     return rows[0];
   }
-  static async getMartCommonWhere() {
-    let logBase = `models/martModel.getMartCommonWhere:`;
+  
+  //getMartOptions for search select
+  static async getMartOptions(moaCode) {
+    let logBase = `models/martModel.getMartOptions: `;
 
-    const sql = `SELECT
-    C_CODE, C_KO, C_ENG
-    FROM
-    TBL_MOA_CODE_COMMON
-    WHERE C_GRP = 'DB'
-    AND C_USE = 'Y'
-    ORDER BY C_ORDER ASC`;
+    let sql = ` SELECT
+      MMB.SEQ AS SEQ, MMB.M_MOA_CODE AS CODE, MMB.M_NAME AS NAME
+  FROM
+      TBL_MOA_MART_BASIC AS MMB
+  WHERE
+      MMB.M_STATUS = 'A'`;
+    if (moaCode !== "") {
+      sql += ` AND MMB.M_MOA_CODE = '${moaCode}' `;
+    }
     const [rows] = await pool.mysqlPool.query(sql);
     return rows;
   }

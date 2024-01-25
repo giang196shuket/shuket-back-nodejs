@@ -7,7 +7,6 @@ var router = express.Router();
 
 
 router.post("/login", validation.validationLogin, controller.login);
-router.get("/get_list_account_switch",middleware.verifyToken , controller.getListAccountSwitch);
 router.get("/user_switch_account/:id",middleware.verifyToken , controller.userSwitchAccount);
 router.get("/reset_account",middleware.verifyToken , controller.resetAccount);
 

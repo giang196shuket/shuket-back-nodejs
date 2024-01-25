@@ -58,15 +58,20 @@ module.exports = class authModel {
       return { status: false, msg: error.stack };
     }
   }
-  static async getListAccountSwitch()
-  {
-    const sql =
-      `SELECT
-				M_MOA_CODE as user_acc,
-				M_NAME as user_name
-			FROM TBL_MOA_MART_BASIC MART_BASIC
-			WHERE MART_BASIC.M_STATUS='A' `;
-    const [rows] = await pool.mysqlPool.query(sql);
-    return rows;
+  static async getDBconnect(martId) {
+    let logBase = `authModel.getDBconnect: martId: ${martId}`;
+      try {
+      let  sql = `SELECT CASE
+      WHEN M_DB_CONNECT = 'TGT' THEN 'TOGETHERS'
+      WHEN  M_DB_CONNECT = 'GPM' THEN 'GROUP_MAIN'
+     END AS M_DB_CONNECT, T_POS_CODE, M_POS_REGCODE,M_MOA_CODE  FROM TBL_MOA_MART_CONFIG WHERE M_MOA_CODE = '${martId}'`;
+
+      const [row] = await pool.mysqlPool.query(sql);
+
+      return row[0]
+    } catch (error) {
+      logger.writeLog("error", `${logBase} : ${error.stack}`);
+      return null
+    }
   }
 };

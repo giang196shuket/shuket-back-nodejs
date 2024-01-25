@@ -3,7 +3,7 @@ const { messageSuccess } = require("../../helper/message");
 const { getDataFieldFrom } = require("../../helper/queries");
 const { responseSuccess } = require("../../helper/response");
 const { generateBannerCodeForMart, removeTypeFileOfName, getSize } = require("../../helper/upload");
-const imagesBannerCouponModel = require("../../model/images/banner_coupon");
+const imagesBannerCouponModel = require("../../model/images/bannerCoupon");
 const { s3 } = require("../../service/uploadS3");
 
 
@@ -94,10 +94,9 @@ module.exports = {
         .status(500)
         .json(responseErrorInput(req.multerError));
     }
-    console.log(req.body)
     const {bnr_status, bnr_status_logic, image_cate, image_type, is_set_mart } = req.body
     const user = req.userInfo
-    console.log('user',  user)
+
     console.log(' req.body',  req.body)
     console.log(' req.files',  req.files)
 

@@ -1,11 +1,10 @@
 var express = require("express");
-const  controller  = require("../controller/pos");
+const  controller  = require("../controller/order/order");
 const  middleware  = require("../middleware/auth");
 
 var router = express.Router();
 
-
-router.get("/get_pos_options",  middleware.verifyToken, controller.getPosOptions);
+router.post("/get_order_list",  middleware.verifyToken, controller.getOrderList);
 
 
 module.exports = router;

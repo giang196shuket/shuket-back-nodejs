@@ -2,17 +2,17 @@ const logger = require("../../../config/logger");
 const { generate_token } = require("../../service/auth");
 const { messageError, messageSuccess } = require("../../helper/message");
 const { responseSuccess, responseErrorData } = require("../../helper/response");
-const appBuilderModel = require("../../model/appBuilder");
 const moment = require("moment");
 const queriesHelper = require("../../helper/queries");
-const templateViewModel = require("../../model/templateView/templateView");
-const { stringLimitWords } = require("../../helper/funtion");
 const { loadImageAws } = require("../../service/loadImage");
 const { composeTypeOneTemplateData } = require("./teamplate/one");
 const { composeTypeEightTemplateData } = require("./teamplate/eight");
 const { composeTypeTenTemplateData } = require("./teamplate/ten");
 const { composeTypeFiveteenTemplateData } = require("./teamplate/fiveteen");
 const { composeTypeTwoTemplateData } = require("./teamplate/two");
+const appBuilderModel = require("../../model/appBuilder/appBuilder");
+const templateViewModel = require("../../model/appBuilder/common");
+const { listTemplateCode } = require("../../helper/const");
 
 async function getTemplateNotUse(martId, sreenCode) {
   // appBuilderModel
@@ -20,20 +20,12 @@ async function getTemplateNotUse(martId, sreenCode) {
     martId,
     sreenCode
   );
-  const listTemplateCodeCheck = [
-    "AP00000001",
-    "AP00000004",
-    "AP00000008",
-    "AP00000009",
-    "AP00000012",
-    "AP00000018",
-    "AP00000017",
-  ];
+  
   let arrayTemplateShow = [];
   let arrayTemplateHide = [];
 
   screenData.forEach((val) => {
-    if (listTemplateCodeCheck.includes(val.T_SC_DT_TMPL_CODE)) {
+    if (listTemplateCode.includes(val.T_SC_DT_TMPL_CODE)) {
       if ((val.T_SC_DT_TMPL_CODE = "AP00000001")) {
         //AP00000001 template của 1 cái banner
         let templateBannerData = JSON.parse(val.T_SC_DT_TMPL_DATA);
@@ -99,20 +91,12 @@ async function getTemplateNotUseApp(martId, targetCode) {
     martId,
     sreenCode
   );
-  const listTemplateCodeCheck = [
-    "AP00000001",
-    "AP00000004",
-    "AP00000008",
-    "AP00000009",
-    "AP00000012",
-    "AP00000018",
-    "AP00000017",
-  ];
+
   let arrayTemplateShow = [];
   let arrayTemplateHide = [];
 
   screenData.forEach((val) => {
-    if (listTemplateCodeCheck.includes(val.T_SC_DT_TMPL_CODE)) {
+    if (listTemplateCode.includes(val.T_SC_DT_TMPL_CODE)) {
       if ((val.T_SC_DT_TMPL_CODE = "AP00000001")) {
         //AP00000001 template của 1 cái banner
         let templateBannerData = JSON.parse(val.T_SC_DT_TMPL_DATA);

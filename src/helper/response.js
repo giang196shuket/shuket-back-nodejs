@@ -29,5 +29,12 @@ const responseErrorData = (code, filed ,message) =>{
     }
 
 }
-
-module.exports = {responseSuccess, responseErrorInput, responseErrorData} 
+const responseDataList = (page, limit, total, list) =>{
+   return {
+    page : page,
+    limit : limit,
+    total : total,
+    list: list
+   }
+}
+module.exports = {responseSuccess, responseErrorInput, responseErrorData, responseDataList} 

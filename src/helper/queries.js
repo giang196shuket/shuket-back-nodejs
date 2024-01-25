@@ -2,22 +2,6 @@ const logger = require("../../config/logger");
 const pool = require("../../config/database");
 
 module.exports = class queriesHelper {
-  static async getDBconnect(martId) {
-    let logBase = `queriesHelper.getDBconnect: martId: ${martId}`;
-      try {
-      let  sql = `SELECT CASE
-      WHEN M_DB_CONNECT = 'TGT' THEN 'TOGETHERS'
-      WHEN  M_DB_CONNECT = 'GPM' THEN 'GROUP_MAIN'
-     END AS M_DB_CONNECT, T_POS_CODE, M_POS_REGCODE,M_MOA_CODE  FROM TBL_MOA_MART_CONFIG WHERE M_MOA_CODE = '${martId}'`;
-
-      const [row] = await pool.mysqlPool.query(sql);
-
-      return row[0]
-    } catch (error) {
-      logger.writeLog("error", `${logBase} : ${error.stack}`);
-      return null
-    }
-  }
     static async getDataCountWhere(table, where) {
         let logBase = `queriesHelper.getDataCountWhere: `;
           try {
@@ -48,7 +32,7 @@ module.exports = class queriesHelper {
       static async getRowDataFieldWhere(field, table, where) {
         let logBase = `queriesHelper.getListDataWhere: `;
           try {
-          let  sql = `SELECT ${field}  FROM ${table} WHERE ${where}`;
+          let  sql = `SELECT ${field}  FROM ${table} WHERE ${where} LIMIT 1`;
 
           // logger.writeLog("info", `${logBase} : ${sql}`);
           const [rows] = await pool.mysqlPool.query(sql);

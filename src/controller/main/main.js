@@ -1,15 +1,13 @@
-const logger = require("../../config/logger");
-const { generate_token } = require("../service/auth");
-const { messageError, messageSuccess } = require("../helper/message");
-const { responseSuccess, responseErrorData } = require("../helper/response");
-const mainModel = require("../model/main");
-const { loadImageAws } = require("../service/loadImage");
-const userModel = require("../model/user");
-
-
+const logger = require("../../../config/logger");
+const { generate_token } = require("../../service/auth");
+const { messageError, messageSuccess } = require("../../helper/message");
+const { responseSuccess, responseErrorData } = require("../../helper/response");
+const mainModel = require("../../model/main/main");
+const { loadImageAws } = require("../../service/loadImage");
+const userModel = require("../../model/user/user");
+const { bucketImage } = require("../../helper/const");
 
 async function mergeRoleList(menuUser) {
-
   let list = [];
   menuUser.forEach((ele) => {
     if (ele.U_CATE_DEPT === 1) {
@@ -73,15 +71,15 @@ module.exports = {
       dataResponse.user_level = userProfile.U_LEVEL;
       dataResponse.user_status = userProfile.U_STATUS;
       if (userProfile.M_LOGO !== "") {
-        dataResponse.mart_logo = await loadImageAws(
+        dataResponse.mart_logo = loadImageAws(
           userProfile.M_LOGO,
-          "mart/logo"
+          bucketImage.martlogo
         );
       }
       if (userProfile.M_LOGO_PUSH !== "") {
-        dataResponse.mart_logo_push = await loadImageAws(
+        dataResponse.mart_logo_push =  loadImageAws(
           userProfile.M_LOGO_PUSH,
-          "mart/logo"
+          bucketImage.martlogo
         );
       }
       dataResponse.mart_name = userProfile.M_NAME;
@@ -104,15 +102,15 @@ module.exports = {
       dataResponse.user_status = "A";
       const martSwitch = await mainModel.getMartInfoSwitch(user.u_martid);
       if (martSwitch.M_LOGO !== "") {
-        dataResponse.mart_logo = await loadImageAws(
+        dataResponse.mart_logo = loadImageAws(
           martSwitch.M_LOGO,
-          "mart/logo"
+          bucketImage.martlogo
         );
       }
       if (martSwitch.M_LOGO_PUSH !== "") {
-        dataResponse.mart_logo_push = await loadImageAws(
+        dataResponse.mart_logo_push = loadImageAws(
           martSwitch.M_LOGO_PUSH,
-          "mart/logo"
+          bucketImage.martlogo
         );
       }
       dataResponse.mart_name = userProfile.M_NAME;
@@ -197,12 +195,12 @@ module.exports = {
   },
   async getLeftMenuBar(req, res, next) {
     const logBase = `controller/main/getLeftMenuBar: `;
-    console.time('GET');
+    console.time("GET");
     const user = req.userInfo;
     // const currentUserProgs = await userModel.selectProgsRoleByUser(user);
     // const levelProgs = await userModel.selectProgsRoleByLevel(user.level_id);
-    const menuUser = await userModel.getMenuByUser(user)
-    console.timeEnd('GET');
+    const menuUser = await userModel.getMenuByUser(user);
+    console.timeEnd("GET");
 
     const listProgs = await mergeRoleList(menuUser);
     const data = {
@@ -230,7 +228,7 @@ module.exports = {
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
   async getCityOptions(req, res, next) {
-    const data = await mainModel.getCityOptions()
+    const data = await mainModel.getCityOptions();
     const listCity = await data.map((item) => ({
       code: item.CT_CODE,
       name: {
@@ -242,13 +240,13 @@ module.exports = {
       list_cities: listCity,
     };
     return res
-    .status(200)
-    .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
 
   async getDistrictOptions(req, res, next) {
-    const ctCode = req.query.ct_code
-    const data = await mainModel.getDistrictOptions(ctCode)
+    const ctCode = req.query.ct_code;
+    const data = await mainModel.getDistrictOptions(ctCode);
     const listDistricts = await data.map((item) => ({
       code: item.DT_CODE,
       name: {
@@ -260,8 +258,127 @@ module.exports = {
       list_districts: listDistricts,
     };
     return res
-    .status(200)
-    .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
 
+  async getPartnerOptions(req, res, next) {
+    const data = await mainModel.getPartnerOptions();
+    const listPartners = await data.map((item) => ({
+      seq: item.SEQ,
+      code: item.SP_CODE,
+      name: item.SP_NAME,
+    }));
+    const dataResponse = {
+      list_partners: listPartners,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+
+  async getPartnerSalesTeamOptions(req, res, next) {
+    spCode = req.query.sp_code;
+    const data = await mainModel.getPartnerSalesTeamOptions(spCode);
+    const listSalestTeam = await data.map((item) => ({
+      seq: item.SEQ,
+      code: item.SPT_CODE,
+      name: item.SPT_NAME,
+    }));
+    const dataResponse = {
+      list_sales_team: listSalestTeam,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+
+  async getPosOptions(req, res, next) {
+    const data = await mainModel.getPosOptions();
+    const listPos = await data.map((item) => ({
+      seq: item.SEQ,
+      code: item.POS_CODE,
+      name: item.POS_NAME,
+    }));
+    const dataResponse = {
+      list_pos: listPos,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+
+  // GROUP_MAIN, TOGETHER
+  async getMartCommonWhere(req, res, next) {
+    const data = await mainModel.getMartCommonWhere();
+    const listDBPos = await data.map((item) => ({
+      moa_common_code: item.C_CODE,
+      moa_common_name_ko: item.C_KO,
+      moa_common_name_en: item.C_ENG,
+    }));
+    const dataResponse = listDBPos;
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+
+
+  //for import product
+  async getListMartImport(req, res, next) {
+    const user = req.userInfo;
+    let userId = null;
+    const rows = await mainModel.getListMartImport();
+    if (user.is_change === 1) {
+      userId = user.old_userid;
+    } else {
+      userId = user.user_id;
+    }
+    const account = await mainModel.getAccountImport(userId);
+    const dataResponse = {
+      total_cnt: rows.length,
+      listmart: rows,
+      account: account.U_NAME,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+
+  //list switch account
+  async getListAccountSwitch(req, res, next) {
+    const data = await mainModel.getListAccountSwitch();
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, data));
+  },
+  //for manager mart account page
+  async getLevelOptions(req, res, next) {
+    const result = await mainModel.getLevelOptions();
+
+    const dataResponse = {
+      list: result,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+
+  async getGroupOptions(req, res, next) {
+    const result = await mainModel.getGroupOptions();
+    const dataResponse = {
+        list: result,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+  async getLevelSearchList(req, res, next) {
+    const result = await mainModel.getLevelSearchList();
+    const dataResponse = {
+        list: result,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
 };

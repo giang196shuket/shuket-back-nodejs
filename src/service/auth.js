@@ -7,7 +7,8 @@ const bcrypt = require('bcryptjs');
 const logger = require("../../config/logger");
 
 const jwt_key = 'eyJ0eXAiOiJKV1QiLOcMgo2o!)@)#)I1NiJ9IiRkYXRhIg'
-const jwt_expires = 3600
+// const jwt_expires = 3600
+const jwt_expires = '1d'
 
 module.exports = {    
 

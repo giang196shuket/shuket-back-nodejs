@@ -2,10 +2,6 @@
     Success : 'Your request is successful'
 }
 
-const typeLog = {
-   SetCustomMaxMinQty: 'SET CUSTOM MAX MIN QTY'
-}
-
  const messageError = {
    InvalidMethod:"Invalid http method", //405
    uploadFailed: "Upload failed",
@@ -22,4 +18,4 @@ const typeLog = {
    Suspened:'Sorry, Your account is suspened. Please contact our customer support team.'
 }
 
-module.exports = {messageSuccess, messageError, typeLog} 
+module.exports = {messageSuccess, messageError} 

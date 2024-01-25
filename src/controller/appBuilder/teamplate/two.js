@@ -1,8 +1,9 @@
 const moment = require("moment");
-const templateViewTwoModel = require("../../../model/templateView/teamplate/two");
+const templateViewTwoModel = require("../../../model/appBuilder/teamplate/two");
 const { loadImageAws } = require("../../../service/loadImage");
 const { LINK_EVENT_IMAGE } = require("../../../helper/link");
-const { getCommonImageJsonData } = require("../funtion");
+const { getCommonImageJsonData } = require("../common");
+const { bucketImage } = require("../../../helper/const");
 
 module.exports = {
    async composeTypeTwoTemplateData (templateData, martId){
@@ -28,7 +29,7 @@ module.exports = {
                         contentsID : actualData.B_CODE,
                         contentsTitle: moment(actualData.C_TIME).format('DD-MM-YYYY'),
                         contentsDescription: description,
-                        imageUrl: getCommonImageJsonData(1, await loadImageAws(actualData.B_IMG_CV,'notice/cover'),null, null , null),
+                        imageUrl: getCommonImageJsonData(1, loadImageAws(actualData.B_IMG_CV,bucketImage.notice),null, null , null),
                         index_position: iRun,
                         class : activeClass
                     })

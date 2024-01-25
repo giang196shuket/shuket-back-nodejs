@@ -1,11 +1,12 @@
 const { messageError, messageSuccess } = require("../../helper/message");
 const { responseSuccess, responseErrorData, responseErrorInput } = require("../../helper/response");
-const userModel = require("../../model/user");
-const martModel = require("../../model/mart");
+const userModel = require("../../model/user/user");
+const martModel = require("../../model/mart/mart");
 const moment = require("moment");
 const { loadImageAws } = require("../../service/loadImage");
 const { s3 } = require("../../service/uploadS3");
 const  {getSize, getNameMartLogo}  = require("../../helper/upload");
+const { bucketImage } = require("../../helper/const");
 
 
 module.exports = {
@@ -148,20 +149,19 @@ module.exports = {
     const getListPayment = await martModel.getListPaymentOfMart(
       row.M_MOA_CODE
     );
-
-    let martPmCrc = "N";
-    let martPmXod = "N";
+    let paymentCRC = "N"; // ko dùng thanh toán
+    let paymentXOD = "N"; // ko dùng thu hộ
 
     let dataPaymentReturn = [];
     getListPayment.forEach((item) => {
       if (item.C_CODE === "COD" || item.C_CODE === "CCOD") {
         if (item.IS_USE === "Y") {
-          martPmXod = "Y";
+          paymentXOD = 'Y' // dùng thu hộ
         }
       }
       if (item.C_CODE !== "COD" && item.C_CODE !== "CCOD") {
         if (item.IS_USE === "Y") {
-          martPmCrc = "Y";
+          paymentCRC = 'Y' // dùng thanh toán
         }
       }
       dataPaymentReturn.push({
@@ -274,9 +274,9 @@ module.exports = {
       show_franchise: showfranchise,
       logo_name: row.M_LOGO,
       logo_push_name: row.M_LOGO_PUSH,
-      logo_url: row.M_LOGO ? await loadImageAws(row.M_LOGO, "mart/logo") : "",
+      logo_url: row.M_LOGO ?  loadImageAws(row.M_LOGO, bucketImage.martlogo) : "",
       logo_push_url: row.M_LOGO
-        ? await loadImageAws(row.M_LOGO_PUSH, "mart/logo")
+        ?  loadImageAws(row.M_LOGO_PUSH, bucketImage.martlogo)
         : "",
       mart_display_status: row.HIDE_SHUKET,
       name: row.M_NAME,
@@ -338,8 +338,8 @@ module.exports = {
       hidecheckbox:
         row.IS_STOCK === "Y" && row.INITIAL_STOCK_DATE !== "" ? 1 : 0,
       op_payment: dataPaymentReturn,
-      mart_pm_crc: martPmCrc,
-      mart_pm_xod: martPmXod,
+      mart_pm_crc: paymentCRC,
+      mart_pm_xod: paymentXOD,
       mart_business_type: martBusinessType,
       old_type: type,
       old_group_mart: row.M_HQ_CODE,
@@ -392,18 +392,7 @@ module.exports = {
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
 
-  async getMartCommonWhere(req, res, next) {
-    const data = await martModel.getMartCommonWhere();
-    const listDBPos = await data.map((item) => ({
-      moa_common_code: item.C_CODE,
-      moa_common_name_ko: item.C_KO,
-      moa_common_name_en: item.C_ENG,
-    }));
-    const dataResponse = listDBPos;
-    return res
-      .status(200)
-      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
-  },
+
 
   async uploadMartLogo(req, res, next) {
     if (req.multerError) {
@@ -412,7 +401,7 @@ module.exports = {
       .json(responseErrorInput(req.multerError));
   }
     const file = req.file;
-    const newNameFile = getNameMartLogo()
+    const newNameFile = getNameMartLogo() // generate new name
     const params = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: "mart/logo/" + newNameFile,
@@ -445,5 +434,15 @@ module.exports = {
             .status(500)
             .json(responseErrorInput( error));
     }
+  },
+  async getMartOptions(req, res, next) {
+    const user = req.userInfo;
+    const result = await mainModel.getMartOptions(user.u_martid);
+    const dataResponse = {
+      list: result,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
 };

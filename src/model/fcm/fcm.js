@@ -1,5 +1,5 @@
-const pool = require("../../config/database");
-const logger = require("../../config/logger");
+const pool = require("../../../config/database");
+const logger = require("../../../config/logger");
 const moment = require("moment");
 
 

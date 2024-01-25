@@ -1,5 +1,5 @@
-const templateViewOneModel = require("../../../model/templateView/teamplate/one");
-const { getCommonDestJsonData } = require("../funtion");
+const templateViewOneModel = require("../../../model/appBuilder/teamplate/one");
+const { getCommonDestJsonData } = require("../common");
 
 module.exports = {
     async composeTypeOneTemplateData(templateData, martId, sreenCode) {

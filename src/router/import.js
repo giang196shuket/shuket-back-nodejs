@@ -7,7 +7,6 @@ var router = express.Router();
 
 
 router.post("/upload_file", middleware.verifyToken, uploadStatic.single('file'), controller.uploadFile);
-router.get("/get_listmart", middleware.verifyToken,  controller.getListMartImport);
 
 
 module.exports = router;

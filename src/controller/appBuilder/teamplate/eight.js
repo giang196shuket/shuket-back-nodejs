@@ -1,6 +1,6 @@
 const queriesHelper = require("../../../helper/queries");
-const templateViewEightModel = require("../../../model/templateView/teamplate/eight");
-const { getCommonDestJsonData } = require("../funtion");
+const templateViewEightModel = require("../../../model/appBuilder/teamplate/eight");
+const { getCommonDestJsonData } = require("../common");
 function getPrdImagesObjectByType(prdImages, type, cnt) {
     return {
       urlType: cnt,
@@ -81,15 +81,14 @@ function getPrdImagesObjectByType(prdImages, type, cnt) {
     return result;
   }
 async function getCommonPrdJsonData(prdCode, prdName, prdBCode, martId) {
-    const dbConnect = await queriesHelper.getDBconnect(martId);
   
     const actualData = await templateViewEightModel.getProductTemplateData(
       prdCode,
       prdName,
       prdBCode,
       martId,
-      dbConnect.M_POS_REGCODE,
-      dbConnect.M_DB_CONNECT
+      req.dbConnect.M_POS_REGCODE,
+      req.dbConnect.M_DB_CONNECT
     );
     if (!actualData) {
       return null;

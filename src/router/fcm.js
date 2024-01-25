@@ -1,5 +1,5 @@
 var express = require("express");
-const  controller  = require("../controller/fcm");
+const  controller  = require("../controller/fcm/fcm");
 const  middleware  = require("../middleware/auth");
 
 var router = express.Router();
