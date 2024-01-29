@@ -12,6 +12,8 @@ const {
   generateTag,
   arrayColumn,
   arrayColumnAssign,
+  customArrayImageProduct,
+  customCategoryProduct,
 } = require("../../helper/funtion");
 const {
   loadImageAws,
@@ -335,12 +337,7 @@ module.exports = {
         pos_regcode: row.M_POS_REGCODE,
         code: row.P_CODE,
         name: row.P_NAME,
-        category:
-          row.P_CAT +
-          " " +
-          (row.P_CAT_MID ? ` > ${row.P_CAT_MID}` : " ") +
-          " " +
-          (row.P_CAT_SUB ? ` > ${row.P_CAT_SUB}` : " "),
+        category: customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
         unit: row.P_UNIT,
         barcode: row.P_BARCODE,
         status: row.P_STATUS,
@@ -365,6 +362,7 @@ module.exports = {
         pro_min_qty_default: !row.P_VALUE_MINQTY_PD ? 0 : row.P_VALUE_MINQTY_PD,
         pro_show_settings_max_min: proSettingsMaxMin,
         use_time: row.USE_TIME,
+        images: customArrayImageProduct(row.P_IMG),
         time_start: row.TIME_START
           ? moment(row.TIME_START).format("YYYY-MM-DD")
           : null,
@@ -377,25 +375,7 @@ module.exports = {
         update_name: row.M_NAME,
         update_time: row.M_TIME,
       };
-      // gán mảng hình ảnh cho product
-      const productImages = JSON.parse(row.P_IMG);
-      let arrImage = [];
-      let j = 0;
-      productImages.forEach((prdImage) => {
-        arrImage[j] = loadImageAwsProduct(prdImage, bucketImage.product);
-        if (prdImage.main === 1) {
-          arrImage[j].main = 1; // ảnh phụ
-        } else {
-          arrImage[j].main = 0; //ảnh chính
-        }
-        j++;
-      });
-      if (arrImage.length === 0) {
-        arrImage[0] = {
-          thumb: loadNoImage(),
-          main: 1,
-        };
-      }
+
       // bắt đầu gán giá trị stock cho product
       if (dataMergeStock[row.P_CODE] && isMerge === 1) {
         list[i].value_stock = dataMergeStock[row.P_CODE];
@@ -441,7 +421,6 @@ module.exports = {
         list[i].date_sync_stock = "-/-";
         list[i].time_sync_stock = "-/-";
       }
-      list[i].images = arrImage;
       i++;
     }
     const checkUseMaxQty = await queriesHelper.getRowDataWhere(

@@ -415,7 +415,8 @@ module.exports = {
         }
         const dataApp = await composeTypeEightTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
-          user.u_martid
+          user.u_martid,
+          req.dataConnect
         );
 
         jsonDetailData.push({
@@ -443,7 +444,8 @@ module.exports = {
         }
         const dataApp = await composeTypeTenTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
-          user.u_martid
+          user.u_martid,
+          req.dataConnect
         );
 
         jsonDetailData.push({

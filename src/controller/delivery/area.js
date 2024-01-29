@@ -3,7 +3,7 @@ const { LINK_KAKAO_XY, LINK_KAKAO_DETAIL } = require("../../helper/link");
 const { messageError, messageSuccess } = require("../../helper/message");
 const { responseSuccess, responseErrorData } = require("../../helper/response");
 const { generateArray, getLimitQuery } = require("../../helper/funtion");
-const addressModel = require("../../model/delivery/address");
+const addressModel = require("../../model/delivery/area");
 const queriesHelper = require("../../helper/queries");
 const moment = require("moment")
 
@@ -236,7 +236,7 @@ module.exports = {
         }
       });
       list[i] = {
-        number_order: i + 1,
+        id: i + 1,
         seq: row.seq,
         address_name: row.address_name,
         road_address_name: row.road_address_name,

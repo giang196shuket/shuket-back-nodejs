@@ -1,4 +1,4 @@
-const { bannerDefault, bucketImage, textDF, martBGColorDefault } = require("../../helper/const");
+const { bannerDefault, bucketImage, textDeFault, martBGColorDefault } = require("../../helper/const");
 const { getLimitQuery } = require("../../helper/funtion");
 const { messageSuccess } = require("../../helper/message");
 const queriesHelper = require("../../helper/queries");
@@ -116,7 +116,7 @@ module.exports = {
         bannerAppUrl : row.M_BANNER_APP ? loadImageAws(row.M_BANNER_APP , bucketImage.bannerapp) : loadImageAws(bannerDefault , bucketImage.bannerapp),
         logoAppUrl : row.M_LOGO_APP ? loadImageAws(row.M_LOGO_APP , bucketImage.logoapp) : loadImageAws(row.M_LOGO , bucketImage.logoapp),
         phone: row.M_PHONE,
-        martIntroApp : row.M_INTRO_APP ? row.M_INTRO_APP : row.M_NAME + textDF.intro1 + row.M_NAME + textDF.intro2,
+        martIntroApp : row.M_INTRO_APP ? row.M_INTRO_APP : row.M_NAME + textDeFault.intro1 + row.M_NAME + textDeFault.intro2,
         notice: noticeList, // list notice trên app
         isUploadLogo: 0,
         isUploadBanner : 0,

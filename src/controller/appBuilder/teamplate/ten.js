@@ -5,7 +5,7 @@ const templateViewTenModel = require("../../../model/appBuilder/teamplate/ten");
 const { loadImageAws } = require("../../../service/loadImage");
 
 module.exports = {
-    async  composeTypeTenTemplateData(templateData, martId) {
+    async  composeTypeTenTemplateData(templateData, martId, dataConnect) {
         let countIndex = 0;
         let templateDataArr = [];
         for (const val of templateData?.tmpl_data) {
@@ -13,7 +13,7 @@ module.exports = {
             val.tmpl_dt_cd,
             val.tmpl_dt_dest_flg,
             martId,
-            req.dbConnect.M_DB_CONNECT
+            dataConnect.M_DB_CONNECT
           );
           if (actualData) {
             let destiTarget = "PCL"; //large
@@ -26,7 +26,7 @@ module.exports = {
               const dataMidCate = templateViewTenModel.getCateMid(
                 actualData.P_CAT_CODE,
                 martId,
-                req.dbConnect.M_DB_CONNECT
+                dataConnect.M_DB_CONNECT
               );
               if (dataMidCate.length > 0) {
                 popupMid = 1;

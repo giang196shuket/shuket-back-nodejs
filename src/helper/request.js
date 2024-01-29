@@ -1,4 +1,13 @@
 
+
+// page , 
+// limit, 
+// keywordType, 
+// keywordValue, 
+// orderBy, 
+// status,
+// dateStart,
+// dateEnd
 const requsetSearchListDate = (req, extra) => {
     let params = {
         page : req?.page, 
@@ -38,4 +47,14 @@ const requsetSearchList = (req, extra) => {
     return params
 }
 
-module.exports = { requsetSearchList, requsetSearchListDate} 
+//check method của router
+function checkMethod(currentMethod, standalMethod) {
+    if (currentMethod !== standalMethod) {
+      return { code: 405, message: messageError.InvalidMethod };
+    } else {
+      return true;
+    }
+  }
+  
+
+module.exports = { requsetSearchList, requsetSearchListDate, checkMethod} 

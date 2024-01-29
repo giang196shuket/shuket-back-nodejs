@@ -1,5 +1,5 @@
 const { messageError, messageSuccess } = require("../../helper/message");
-const { responseSuccess, responseErrorData, responseErrorInput } = require("../../helper/response");
+const { responseSuccess, responseErrorData, responseErrorInput, responseDataList } = require("../../helper/response");
 const userModel = require("../../model/user/user");
 const martModel = require("../../model/mart/mart");
 const moment = require("moment");
@@ -7,37 +7,21 @@ const { loadImageAws } = require("../../service/loadImage");
 const { s3 } = require("../../service/uploadS3");
 const  {getSize, getNameMartLogo}  = require("../../helper/upload");
 const { bucketImage } = require("../../helper/const");
+const fcmModel = require("../../model/fcm/fcm");
+const { requsetSearchList } = require("../../helper/request");
 
 
 module.exports = {
   async moaSearchList(req, res, next) {
     const logBase = `controller/mart/moaSearchList: `;
-    const {
-      limit,
-      page,
-      app_type,
-      keyword_type,
-      keyword_value,
-      mart_use_sync_order,
-      mart_with_stock,
-      status,
-    } = req.body;
-    const offset = page * limit - limit;
-    const data = await martModel.moaSelectMarts(
-      limit,
-      page,
-      app_type,
-      keyword_type,
-      keyword_value,
-      mart_use_sync_order,
-      mart_with_stock,
-      status,
-      offset
-    );
+
+    const params = requsetSearchList(req.body,['appType','isSyncOrder','useStock'])
+    const offset =  params.page * params.limit - params.limit;
+    const data = await martModel.moaSelectMarts( params, offset );
     let list = [];
     let i = 1;
     let statusStock = "E";
-    data.forEach((row) => {
+    data.list.forEach((row) => {
       if (row.IS_STOCK == "Y" && row.IS_STOP_STOCK == "N") {
         statusStock = "Y"; //USE STOCK
       }
@@ -52,7 +36,7 @@ module.exports = {
         martBusinessType = "FA";
       }
       list.push({
-        number_order: i++,
+        id: i++,
         mart_seq: row.MART_SEQ.toString(),
         mart_type: martBusinessType,
         mart_code: row.M_MOA_CODE,
@@ -98,11 +82,7 @@ module.exports = {
     });
 
     const dataResponse = {
-      page_index: page,
-      page_size: limit,
-      page_count: Math.ceil(data.length / limit),
-      search_count: data.length,
-      list_marts: list,
+      ...responseDataList(params.page, params.limit , data.total, list)
     };
 
     return res
@@ -357,7 +337,7 @@ module.exports = {
       is_extend_brgn: row.USE_EXTEND_BRGN ? row.USE_EXTEND_BRGN : "N",
     };
 
-    const listFCM = await martModel.getAllFcmList();
+    const listFCM = await fcmModel.fcmList();
     const configCustom = await martModel.getDataConfigCustomMart(
       row.M_MOA_CODE
     );

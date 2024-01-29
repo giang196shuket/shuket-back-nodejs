@@ -5,21 +5,24 @@ const { password_verify } = require("../../service/auth");
 
 module.exports = class martModel {
   static async moaSelectMarts(
-    limit,
-    page,
-    appType,
-    keywordType,
-    keywordValue,
-    martUseSyncOrder,
-    martWithStock,
-    status,
+    {
+      limit,
+      page,
+      appType,
+      keywordType,
+      keywordValue,
+      isSyncOrder,
+      useStock,
+      status,
+    },
     offset
   ) {
     let logBase = `models/martModel.moaSelectMarts: `;
 
     try {
       let sql = ` SELECT
-        MB.SEQ AS MART_SEQ, MB.SP_CODE, MB.SPT_CODE, MB.M_MOA_CODE, MC.M_POS_REGCODE, MB.M_NAME AS MART_NAME, MB.M_DISTRICT AS DISTRICT_NAME, MB.C_TIME,
+        MB.SEQ AS MART_SEQ, MB.SP_CODE, MB.SPT_CODE, MB.M_MOA_CODE, MC.M_POS_REGCODE, MB.M_NAME AS MART_NAME, 
+        MB.M_DISTRICT AS DISTRICT_NAME, MB.C_TIME,
         '0' AS SUBSCR_CNT,
         '0' AS SUBSCR_PAYMENT,
         '0' AS COLLECTED,
@@ -61,6 +64,30 @@ module.exports = class martModel {
             GROUP BY
                 MCAD.DT_CODE, MCAD.DT_NAME_EN, MCAD.DT_NAME_KR
         ) AS MCAD ON MB.DT_CODE = MCAD.DT_CODE `;
+      let sqlCount = ` SELECT COUNT(MB.SEQ) AS CNT
+  FROM
+      TBL_MOA_MART_BASIC AS MB
+      JOIN TBL_MOA_MART_CONFIG AS MC ON MC.M_MOA_CODE = MB.M_MOA_CODE
+      JOIN TBL_SP_BASIC AS SB ON MB.SP_CODE = SB.SP_CODE
+      LEFT JOIN TBL_MOA_CODE_COMMON AS MCC ON MCC.C_CODE = MC.M_APP_TYPE AND MCC.C_GRP = 'AT'
+      LEFT JOIN
+      (
+          SELECT
+              MCAC.CT_CODE, MCAC.CT_NAME_EN, MCAC.CT_NAME_KR
+          FROM
+              TBL_MOA_CODE_AREA AS MCAC
+          GROUP BY
+              MCAC.CT_CODE, MCAC.CT_NAME_EN, MCAC.CT_NAME_KR
+      ) AS MCAC ON MB.CT_CODE = MCAC.CT_CODE
+      LEFT JOIN
+      (
+          SELECT
+              MCAD.DT_CODE, MCAD.DT_NAME_EN, MCAD.DT_NAME_KR
+          FROM
+              TBL_MOA_CODE_AREA AS MCAD
+          GROUP BY
+              MCAD.DT_CODE, MCAD.DT_NAME_EN, MCAD.DT_NAME_KR
+      ) AS MCAD ON MB.DT_CODE = MCAD.DT_CODE `
       let whereStr = " WHERE 1=1 ";
       if (appType) {
         whereStr += ` AND MC.M_APP_TYPE = '${appType}' `;
@@ -87,21 +114,24 @@ module.exports = class martModel {
       } else {
         whereStr += " AND MB.M_STATUS = 'A' ";
       }
-      if (martUseSyncOrder === true || martUseSyncOrder === 1) {
+      if (isSyncOrder === true || isSyncOrder === 1) {
         whereStr += ` AND MC.USE_TDC_ORDER = 'Y' `;
       }
-      if (martWithStock === true || martWithStock === 1) {
+      if (useStock === true || useStock === 1) {
         whereStr += ` AND MC.IS_STOCK = 'Y' AND MC.IS_STOP_STOCK = 'N' `;
       }
 
       sql += whereStr + " ORDER BY MB.SEQ DESC ";
+      sqlCount += whereStr + " ORDER BY MB.SEQ DESC ";
       if (offset && limit) {
         sql += " LIMIT " + offset + "," + limit;
       }
       console.log(sql);
 
-      const [rows] = await pool.mysqlPool.query(sql);
-      return rows;
+      const [list] = await pool.mysqlPool.query(sql);
+      const [total] = await pool.mysqlPool.query(sqlCount);
+
+      return {list: list, total: total[0].CNT};
     } catch (error) {
       logger.writeLog("error", `${logBase} : ${error.stack}`);
       return null;
@@ -132,7 +162,7 @@ module.exports = class martModel {
             LEFT JOIN TBL_SP_BASIC AS SP ON SP.SP_CODE = MB.SP_CODE
             LEFT JOIN TBL_SP_SALES_TEAM AS ST ON ST.SPT_CODE = MB.SPT_CODE
             WHERE MB.SEQ =  ${seq}`;
-    console.log(sql);
+    // console.log(sql);
 
     const [rows] = await pool.mysqlPool.query(sql);
     return rows[0];
@@ -173,7 +203,7 @@ module.exports = class martModel {
     const [rows] = await pool.mysqlPool.query(sql);
     return rows[0];
   }
-  
+
   //getMartOptions for search select
   static async getMartOptions(moaCode) {
     let logBase = `models/martModel.getMartOptions: `;

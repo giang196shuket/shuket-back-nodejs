@@ -4,7 +4,7 @@ const { responseSuccess, responseDataList } = require("../../helper/response");
 const queriesHelper = require("../../helper/queries");
 const productUnregistedModel = require("../../model/product/unregisted");
 const { requsetSearchList } = require("../../helper/request");
-const { getLimitQuery, generateTag } = require("../../helper/funtion");
+const { getLimitQuery, generateTag, customArrayImageProduct } = require("../../helper/funtion");
 const { MartGroupDefault, bucketImage } = require("../../helper/const");
 const { loadImageAwsProduct, loadImageAws, loadNoImage } = require("../../service/loadImage");
 
@@ -32,28 +32,7 @@ module.exports = {
         //generate image for product
         if(checkGroupImage === 'Y'){
             if(row.P_IMG){
-                isGroupImage = 'Y'
-                const productImages = JSON.parse(row.P_IMG)
-                productImages.forEach(prdImg => {
-                    if(prdImg.main === 1){
-                        arrImage.push({
-                            imageUri: loadImageAwsProduct(prdImg, bucketImage.product).thumb,
-                            imagePriority: 1
-                        })
-                    }else{
-                        arrImage.push({
-                            imageUri: loadImageAwsProduct(prdImg, bucketImage.product).thumb,
-                            imagePriority: 0
-                        })
-                    }
-                    
-                });
-                if(arrImage.length === 0){
-                    arrImage.push({
-                        imageUri: loadNoImage(),
-                        imagePriority: 1
-                    })
-                }
+                arrImage = customArrayImageProduct(row.P_IMG)
             }
         }
        //generate tags for product

@@ -80,15 +80,15 @@ function getPrdImagesObjectByType(prdImages, type, cnt) {
     }
     return result;
   }
-async function getCommonPrdJsonData(prdCode, prdName, prdBCode, martId) {
+async function getCommonPrdJsonData(prdCode, prdName, prdBCode, martId, dataConnect) {
   
     const actualData = await templateViewEightModel.getProductTemplateData(
       prdCode,
       prdName,
       prdBCode,
       martId,
-      req.dbConnect.M_POS_REGCODE,
-      req.dbConnect.M_DB_CONNECT
+      dataConnect.M_POS_REGCODE,
+      dataConnect.M_DB_CONNECT
     );
     if (!actualData) {
       return null;
@@ -137,7 +137,7 @@ async function getCommonPrdJsonData(prdCode, prdName, prdBCode, martId) {
         prdCode,
         prdBCode,
         martId,
-        dbConnect.M_DB_CONNECT
+        dataConnect.M_DB_CONNECT
       );
       if (!resultPCode.P_CODE) {
         outOfStock = 0;
@@ -191,7 +191,7 @@ async function getCommonPrdJsonData(prdCode, prdName, prdBCode, martId) {
     };
   }
 module.exports = {
-    async  composeTypeEightTemplateData(templateData, martId) {
+    async  composeTypeEightTemplateData(templateData, martId, dataConnect) {
         const typeTitle = templateData.tmpl_data.title;
         let templateDataArr = [];
         let countIndex = 0;
@@ -200,7 +200,7 @@ module.exports = {
             val.tmpl_dt_cd,
             val.tmpl_dt_tl,
             val.tmpl_dt_bcd,
-            martId
+            martId, dataConnect
           );
           if (result && result.ishide === 0) {
             templateDataArr.push(result);
