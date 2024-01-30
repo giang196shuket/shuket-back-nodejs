@@ -1,6 +1,5 @@
 const { messageError, messageSuccess } = require("../../helper/message");
 const { responseSuccess, responseErrorData, responseErrorInput, responseDataList } = require("../../helper/response");
-const userModel = require("../../model/user/user");
 const martModel = require("../../model/mart/mart");
 const moment = require("moment");
 const { loadImageAws } = require("../../service/loadImage");

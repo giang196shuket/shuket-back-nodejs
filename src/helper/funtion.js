@@ -27,6 +27,14 @@ function limitcontent(content) {
     return "";
   }
 }
+//đếm số lượng 1 ký tự nào đó trong chuội
+function countCharacter(inputString, character) {
+  const slashesArray = inputString.split(character);
+  
+  const numberOfSlashes = slashesArray.length - 1;
+  
+  return numberOfSlashes;
+}
 
 //dùng cho query model offset
 function getLimitQuery(page, limit) {
@@ -41,7 +49,17 @@ function getLimitQuery(page, limit) {
 
   return ` LIMIT ${start}, ${limit}`;
 }
-
+//generate STT cho 1 list 
+function assignSequentialNumbers(list) {
+  let counter = 1;
+  // Duyệt qua từng phần tử trong danh sách
+  for (let i = 0; i < list.length; i++) {
+      // Gán số thứ tự và tăng biến đếm
+      list[i].id = counter;
+      counter++;
+  }
+  return list
+}
 //generate time của order pickup
 function generateTimePickup(C_TIME, O_PICKUP_TIME, addDay) {
   if (addDay) {
@@ -159,6 +177,7 @@ function arrayColumnAssign(data, columnName, indexName) {
 }
 
 module.exports = {
+  countCharacter,
   stringLimitWords,
   getLimitQuery,
   generateArray,
@@ -169,4 +188,5 @@ module.exports = {
   customCategoryProduct,
   limitcontent,
   generateTimePickup,
+  assignSequentialNumbers
 };

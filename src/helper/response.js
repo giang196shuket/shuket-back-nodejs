@@ -1,3 +1,5 @@
+const { assignSequentialNumbers } = require("./funtion")
+
 const responseSuccess = (code, message, data) => {
     return {
         status:'success',
@@ -34,7 +36,7 @@ const responseDataList = (page, limit, total, list) =>{
     page : page,
     limit : limit,
     total : total,
-    list: list
+    list: assignSequentialNumbers(list)
    }
 }
 module.exports = {responseSuccess, responseErrorInput, responseErrorData, responseDataList} 

@@ -4,7 +4,7 @@ const { getCommonDestJsonData } = require("../common");
 function getPrdImagesObjectByType(prdImages, type, cnt) {
     return {
       urlType: cnt,
-      url: prdImages[0].items[0].value,
+      url: prdImages[0]?.items[0].value,
       thumbNailUrl: null,
       width: null,
       height: null,

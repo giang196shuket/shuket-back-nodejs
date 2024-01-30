@@ -1,4 +1,3 @@
-const userModel = require("../../model/user/user");
 const { messageSuccess } = require("../../helper/message");
 const { responseSuccess, responseDataList } = require("../../helper/response");
 const { requsetSearchListDate } = require("../../helper/request");

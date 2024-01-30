@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { LINK_KAKAO_XY, LINK_KAKAO_DETAIL } = require("../../helper/link");
 const { messageError, messageSuccess } = require("../../helper/message");
-const { responseSuccess, responseErrorData } = require("../../helper/response");
+const { responseSuccess, responseErrorData, responseDataList } = require("../../helper/response");
 const { generateArray, getLimitQuery } = require("../../helper/funtion");
 const addressModel = require("../../model/delivery/area");
 const queriesHelper = require("../../helper/queries");
@@ -47,12 +47,8 @@ async function getAddresDetailChild (addr){
 
 
 async function fetchAddresDetailChild(listDataSub) {
-  console.time('child')
-
   const promises = listDataSub.map((addr) => getAddresDetailChild(addr));
   const results = await axios.all(promises);
-  console.timeEnd('child')
-
   return results;
 }
 
@@ -252,12 +248,9 @@ module.exports = {
       i++
     }
 
+    responseDataList
     const  dataResponse = {
-      page_index : page,
-      page_size: per_page,
-      page_count: Math.ceil(rowsList.length / per_page),
-      search_count : rowsList.length,
-      address_list : list
+      ...responseDataList(page, per_page, rowsList.length, list)
     }
     return res
     .status(200)

@@ -46,6 +46,7 @@ module.exports = {
           user_id : userData.user_id,
           u_martid : userData.u_martid,
           u_phone : userData.u_phone ? userData.u_phone : '',
+          u_name: userData.u_name ? userData.u_name : '',
           u_email : userData.u_email ? userData.u_email : '',
           level_id : userData.u_level,
           ctime : userData.ctime,

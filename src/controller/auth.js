@@ -49,6 +49,8 @@ module.exports = {
     async userSwitchAccount (req,res, next){
         const id = req.params.id;
         const user = req.userInfo
+        console.log('usezxczxczxr', user)
+
         const token = await generateToken({...user, is_change : 1, u_level: 301, u_martid: id}, req.headers['user-agent'])
         const dataResponse = {
             token: token,
@@ -68,13 +70,13 @@ module.exports = {
     },
     async resetAccount(req, res, next){
         const user = req.userInfo
-        console.log('user', user)
-            const token = await generateToken({...user, is_change : 0}, req.headers['user-agent'])
+        console.log('usezxczxczxr', user)
+            const token = await generateToken({...user, u_martid:"", level_id: user.old_ulevel,  is_change : 0}, req.headers['user-agent'])
 
             const dataResponse = {
                 token: token,
                 user_id: user.user_id,
-                martid : user.old_martid,
+                martid : '',
                 name: user.u_name ? user.u_name : '',
                 phone: user.u_phone,
                 email: user.u_email,

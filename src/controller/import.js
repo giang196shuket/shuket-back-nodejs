@@ -1,6 +1,7 @@
 const { messageError, messageSuccess } = require("../helper/message");
 const { responseSuccess, responseErrorData, responseErrorInput } = require("../helper/response");
 const moment = require("moment");
+const mainModel = require("../model/main/main");
 
 
 
@@ -30,5 +31,23 @@ module.exports = {
             .json(responseErrorInput( error));
     }
   },
-
+  async getListMartImport(req, res, next) {
+    const user = req.userInfo;
+    let userId = null;
+    const rows = await mainModel.getListMartImport();
+    if (user.is_change === 1) {
+      userId = user.old_userid;
+    } else {
+      userId = user.user_id;
+    }
+    const account = await mainModel.getAccountImport(userId);
+    const dataResponse = {
+      total_cnt: rows.length,
+      listmart: rows,
+      account: account.U_NAME,
+    };
+    return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
 };

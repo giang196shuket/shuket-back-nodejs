@@ -8,7 +8,7 @@ module.exports = class userModel {
   static async getUserSearchList(mart, levelId, group, level, orderBy, keywordType, keywordValue, dateStart, dateEnd , page, limit, offset) {
     let logBase = `models/userModel.getUserSearchList:`;
       try {
-        const  sql = `  SELECT
+        let  sql = ` SELECT
         UA.SEQ AS U_SEQ, UA.U_ID, UA.U_ACC, UA.U_NAME, UA.U_PHONE, UA.U_EMAIL, UA.U_GROUP, UA.U_LEVEL, UA.U_COMPANY,
         UL.U_LEVEL_TITLE, UG.U_GROUP_TITLE, UA.U_MARTID, MB.M_NAME
     FROM
@@ -33,37 +33,37 @@ module.exports = class userModel {
         }
      }
      if(dateStart){
-        where += ` AND  DATE_FORMAT(UA.C_TIME, '%Y-%m-%d') >= DATE_FORMAT('${dateStart}', '%Y-%m-%d')`
+        where += ` AND  DATE_FORMAT(UA.C_TIME, '%Y-%m-%d') >= DATE_FORMAT('${dateStart}', '%Y-%m-%d') `
      }
      if(dateEnd){
-        where += ` AND  DATE_FORMAT(UA.C_TIME, '%Y-%m-%d') <= DATE_FORMAT('${dateEnd}', '%Y-%m-%d')`
+        where += ` AND  DATE_FORMAT(UA.C_TIME, '%Y-%m-%d') <= DATE_FORMAT('${dateEnd}', '%Y-%m-%d') `
      }
      if(levelId){
-        where += ` AND  UA.U_LEVEL >= '${levelId}'`
+        where += ` AND  UA.U_LEVEL >= '${levelId}' `
      }
      if(mart){
-        where += ` AND  UA.U_MARTID = '${mart}'`
+        where += ` AND  UA.U_MARTID = '${mart}' `
      }
      if(group){
-        where += ` AND  UA.U_GROUP = '${group}'`
+        where += ` AND  UA.U_GROUP = '${group}' `
      }
-     if(level){
-        where += ` AND  UA.U_LEVEL = '${level}'`
+     if(level){ 
+        where += ` AND  UA.U_LEVEL = '${level}' `
      }
      if(orderBy){
         if(orderBy === 'oldest'){
-            where += ` ORDER BY UA.C_TIME ASC `
+            where += ` ORDER BY UA.SEQ ASC `
          }
          if( orderBy === 'newest'){
-            where += ` ORDER BY UA.C_TIME DESC `
+            where += ` ORDER BY UA.SEQ DESC `
          }
      }else{
-        where += ` ORDER BY UA.C_TIME DESC `
+        where += ` ORDER BY UA.SEQ DESC `
      }
      if(offset && limit){
         where += ` LIMIT ${offset},${limit} `
      }
-  
+     sql += where
 
      logger.writeLog("info", `${logBase} : ${sql}`);
       const [rows] = await pool.mysqlPool.query(sql);
@@ -178,15 +178,24 @@ module.exports = class userModel {
     try {
       //is_change admin dùng mart đăng nhập
       let sql = ""
-      if(user.u_martid && user.is_change === 0){
+      if("is_change" in user === false){
+        sql =   `SELECT UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE,
+        UC.SORT_ORDER
+        FROM TBL_MOA_USERS_CATE AS UC
+        LEFT JOIN TBL_MOA_USERS_PGRM AS UP ON UP.U_CATE_CODE = UC.U_CATE_CODE AND UP.U_ID = '${user.U_ID}'
+        WHERE UC.IS_USE = 'T'  AND UC.U_CATE_CODE < 30000 AND UC.U_CATE_CODE>=10000
+        AND (case when UC.U_CATE_DEPT=3 AND (UC.URL is null OR UC.URL='') then '' else 'aa' end) !=''
+        ORDER BY  UC.U_CATE_DEPT asc, UC.SORT_ORDER  ASC` 
+      }
+      if(user.u_martid && "is_change" in user === true && user.is_change === 0){
         sql =   `SELECT UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE,
         UC.SORT_ORDER
         FROM TBL_MOA_USERS_CATE AS UC
         LEFT JOIN TBL_MOA_USERS_PGRM AS UP ON UP.U_CATE_CODE = UC.U_CATE_CODE AND UP.U_ID = '${user.user_id}'
-        WHERE UC.IS_USE = 'T'  AND UC.U_CATE_CODE>=30000 
+        WHERE UC.IS_USE = 'T'  AND UC.U_CATE_CODE >= 30000 
         AND (case when UC.U_CATE_DEPT=3 AND (UC.URL is null OR UC.URL='') then '' else 'aa' end) !=''
         ORDER BY  UC.U_CATE_DEPT asc, UC.SORT_ORDER  ASC`
-      }else if (user.u_martid && user.is_change === 1){
+      }else if (user.u_martid && "is_change" in user === true && user.is_change === 1){
         sql = `SELECT UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE,
           UC.SORT_ORDER
           FROM TBL_MOA_USERS_CATE AS UC
@@ -194,7 +203,7 @@ module.exports = class userModel {
           WHERE UC.IS_USE = 'T' AND UC.U_CATE_CODE>=10000
           AND (case when UC.U_CATE_DEPT=3 AND (UC.URL is null OR UC.URL='') then '' else 'aa' end) !=''
           ORDER BY  UC.U_CATE_DEPT asc, UC.SORT_ORDER  ASC`
-      }else if (!user.u_martid){
+      }else if (!user.u_martid && "is_change" in user === true && user.is_change === 0){
         sql = `SELECT UC.U_CATE_CODE, UC.U_CATE_NAME, UC.U_CATE_NAME_EN, UC.U_CATE_NAME_KR, UC.URL, UC.ICON, UC.U_CATE_DEPT, UC.U_CATE_PCD, UC.U_CATE_TYPE,
            UC.SORT_ORDER
            FROM TBL_MOA_USERS_CATE AS UC
@@ -204,7 +213,8 @@ module.exports = class userModel {
            ORDER BY  UC.U_CATE_DEPT asc, UC.SORT_ORDER  ASC`
       }
  
-  
+          logger.writeLog("info", `${logBase} ${sql}`);
+
     const [rows] = await pool.mysqlPool.query(sql);
     return rows
   } catch (error) {
@@ -212,6 +222,9 @@ module.exports = class userModel {
     return null
   }
   }
+  
+  
+ 
   static async selectProgByCode(cate_code) {
     let logBase = `models/userModel.selectProgByCode: cate_code(${cate_code})`;
       try {

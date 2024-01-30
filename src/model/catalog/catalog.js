@@ -13,10 +13,10 @@ module.exports = class catalogModel {
 
       let sql = ` SELECT
       MIC.SEQ,
-      MIC.CATALOG_NAME,
-      MIC.CATALOG_THUMBNAIL_URI,
-      MIC.CATALOG_TAGS,
-      MIC.CATALOG_STATUS,
+      MIC.CATALOG_NAME as name,
+      MIC.CATALOG_THUMBNAIL_URI as image,
+      MIC.CATALOG_TAGS as tags,
+      MIC.CATALOG_STATUS as status,
       MIC.C_TIME,
       MIC.M_TIME,
       IF(MIC.C_ID != 'SYSTEM', (SELECT U_NAME FROM TBL_MOA_USERS_ADMIN WHERE U_ID = MIC.C_ID), 'SYSTEM') AS C_ID,

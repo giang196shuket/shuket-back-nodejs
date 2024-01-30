@@ -4,60 +4,9 @@ const { messageError, messageSuccess } = require("../../helper/message");
 const { responseSuccess, responseErrorData } = require("../../helper/response");
 const mainModel = require("../../model/main/main");
 const { loadImageAws } = require("../../service/loadImage");
-const userModel = require("../../model/user/user");
+const userModel = require("../../model/user/account");
 const { bucketImage } = require("../../helper/const");
-
-async function mergeRoleList(menuUser) {
-  let list = [];
-  menuUser.forEach((ele) => {
-    if (ele.U_CATE_DEPT === 1) {
-      list.push({
-        group_code: ele.U_CATE_CODE,
-        group_route: ele.URL,
-        group_sort: ele.SORT_ORDER,
-        group_names: {
-          vn: ele.U_CATE_NAME,
-          en: ele.U_CATE_NAME_EN,
-          kr: ele.U_CATE_NAME_KR,
-        },
-        group_items: menuUser
-          .filter((cu) => cu.U_CATE_PCD === ele.U_CATE_CODE)
-          .map(function (cate) {
-            //cate la depp2
-            if (cate.U_CATE_DEPT !== 1) {
-              return {
-                code: cate.U_CATE_CODE,
-                route: cate.URL,
-                sort2: cate.SORT_ORDER,
-                name: {
-                  vn: cate.U_CATE_NAME,
-                  en: cate.U_CATE_NAME_EN,
-                  kr: cate.U_CATE_NAME_KR,
-                },
-                sub_items: menuUser
-                  .filter((c) => c.U_CATE_PCD === cate.U_CATE_CODE)
-                  .map(function (c) {
-                    //c la depp3
-                    return {
-                      code: c.U_CATE_CODE,
-                      route: c.URL,
-                      sort3: c.SORT_ORDER,
-                      name: {
-                        vn: c.U_CATE_NAME,
-                        en: c.U_CATE_NAME_EN,
-                        kr: c.U_CATE_NAME_KR,
-                      },
-                    };
-                  }),
-              };
-            }
-          })
-          .filter((gi) => gi !== undefined),
-      });
-    }
-  });
-  return list;
-}
+const { mergeRoleList } = require("./common");
 
 module.exports = {
   async getUserProfile(req, res, next) {
@@ -322,27 +271,7 @@ module.exports = {
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
 
-
-  //for import product
-  async getListMartImport(req, res, next) {
-    const user = req.userInfo;
-    let userId = null;
-    const rows = await mainModel.getListMartImport();
-    if (user.is_change === 1) {
-      userId = user.old_userid;
-    } else {
-      userId = user.user_id;
-    }
-    const account = await mainModel.getAccountImport(userId);
-    const dataResponse = {
-      total_cnt: rows.length,
-      listmart: rows,
-      account: account.U_NAME,
-    };
-    return res
-      .status(200)
-      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
-  },
+  
 
   //list switch account
   async getListAccountSwitch(req, res, next) {
@@ -372,13 +301,5 @@ module.exports = {
       .status(200)
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
-  async getLevelSearchList(req, res, next) {
-    const result = await mainModel.getLevelSearchList();
-    const dataResponse = {
-        list: result,
-    };
-    return res
-      .status(200)
-      .json(responseSuccess(200, messageSuccess.Success, dataResponse));
-  },
+
 };

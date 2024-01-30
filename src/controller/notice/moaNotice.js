@@ -1,6 +1,7 @@
 const { getLimitQuery, limitcontent } = require("../../helper/funtion");
+const { LINK_BACKEND_DEV } = require("../../helper/link");
 const { messageSuccess } = require("../../helper/message");
-const { responseSuccess } = require("../../helper/response");
+const { responseSuccess, responseDataList } = require("../../helper/response");
 const productBarcodeModel = require("../../model/images/productBarcode");
 const moaNotice = require("../../model/notice/moaNotice");
 const { loadImageAws } = require("../../service/loadImage");
@@ -22,6 +23,7 @@ module.exports = {
         }
         jsonResponseData.push({
             ...val,
+            image: LINK_BACKEND_DEV + val.image,
             type: type,
             shortContent: limitcontent(val.content),
             optionCheck: val.status === 'A' ? true : false
@@ -29,10 +31,7 @@ module.exports = {
         })
     }
     const dataResponse = {
-      page : page,
-      limit : limit,
-      totalPage: result.length,
-      list: jsonResponseData
+      ...responseDataList(page,limit, result.length, jsonResponseData)
     }
     return res
     .status(200)

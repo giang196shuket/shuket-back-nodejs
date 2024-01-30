@@ -24,12 +24,9 @@ router.get("/get_partner_options",  middleware.verifyToken, controller.getPartne
 router.get("/get_partner_sales_team_options",  middleware.verifyToken, controller.getPartnerSalesTeamOptions);
 //for pos
 router.get("/get_pos_options",  middleware.verifyToken, controller.getPosOptions);
-//for import product
-router.get("/get_listmart", middleware.verifyToken,  controller.getListMartImport);
 //for switch account auth
 router.get("/get_list_account_switch",middleware.verifyToken , controller.getListAccountSwitch);
 //for manager mart account page
-router.get("/search_level_list",  middleware.verifyToken, controller.getLevelSearchList);
 router.get("/level_options",  middleware.verifyToken, controller.getLevelOptions);
 router.get("/group_options",  middleware.verifyToken, controller.getGroupOptions);
 

@@ -18,10 +18,10 @@ module.exports = {
     rows.forEach(row => {
       list.push({
         number_order : i,
-        fcm_seq : row.SEQ,
-        fcm_code : row.FCM_CODE,
-        fcm_name : row.FCM_NAME,
-        fcm_registerdate: row.C_TIME
+        seq : row.SEQ,
+        code : row.FCM_CODE,
+        name : row.FCM_NAME,
+        registerdate: row.C_TIME
       })
       i++
     });
