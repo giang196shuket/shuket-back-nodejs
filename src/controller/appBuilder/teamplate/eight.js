@@ -28,17 +28,17 @@ function getPrdImagesObjectByType(prdImages, type, cnt) {
           if (priceUpDown === "U") {
             //up
             if (salePrice && salePrice > 0) {
-              priceShow = salePrice + (salePrice / 100) * priceNumber;
+              priceShow = salePrice + parseInt((salePrice / 100) * priceNumber);
             } else {
-              priceShow = retailPrice + (retailPrice / 100) * priceNumber;
+              priceShow = retailPrice + parseInt((retailPrice / 100) * priceNumber);
             }
           }
           if (priceUpDown === "D") {
             //down
             if (salePrice && salePrice > 0) {
-              priceShow = salePrice - (salePrice / 100) * priceNumber;
+              priceShow = salePrice - parseInt((salePrice / 100) * priceNumber);
             } else {
-              priceShow = retailPrice - (retailPrice / 100) * priceNumber;
+              priceShow = retailPrice - parseInt((retailPrice / 100) * priceNumber);
             }
           }
         }
@@ -104,6 +104,7 @@ async function getCommonPrdJsonData(prdCode, prdName, prdBCode, martId, dataConn
       actualData?.PRICE_NUMBER,
       actualData?.PRICE_CUSTOM_STATUS
     );
+    console.log('prdPrice', prdPrice)
     let productName = "";
     if (!actualData.P_NAME) {
       productName = "NON NAME PRD";

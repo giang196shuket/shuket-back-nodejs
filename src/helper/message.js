@@ -3,6 +3,7 @@
 }
 
  const messageError = {
+   ScreenCodeNotExists: "The screen code not exists in the system",
    InvalidMethod:"Invalid http method", //405
    uploadFailed: "Upload failed",
    mimetypeNotValid: "File mimetype not valid",

@@ -13,6 +13,7 @@ const { composeTypeTwoTemplateData } = require("./teamplate/two");
 const appBuilderModel = require("../../model/appBuilder/appBuilder");
 const templateViewModel = require("../../model/appBuilder/common");
 const { listTemplateCode } = require("../../helper/const");
+const { composeTypeSevenTemplateData } = require("./teamplate/seven");
 
 async function getTemplateNotUse(martId, sreenCode) {
   // appBuilderModel
@@ -156,9 +157,11 @@ async function getTemplateNotUseApp(martId, targetCode) {
     totalData: screenData.length,
   };
 }
+
+// get font_size, padding, margin, color ,...
 function getStyleOfTemplate(templateStyle) {
   let styleTitle = {};
-  if (!templateStyle && !Array.isArray(templateStyle)) {
+  if (templateStyle === null  || templateStyle === undefined || Array.isArray(templateStyle)) {
     styleTitle.font_size = 18;
     styleTitle.font_weight = "normal";
     styleTitle.font_color = "#000000";
@@ -177,6 +180,7 @@ function getStyleOfTemplate(templateStyle) {
     };
     return styleTitle;
   } else {
+    //templateStyle is object
     templateStyle?.font_size.forEach((itemFont) => {
       if (itemFont.is_selected === 1) {
         styleTitle.font_size = 18;
@@ -307,8 +311,8 @@ module.exports = {
     });
 
     const dataResponse = {
-      ms_list_data: jsonMainData,
-      ss_list_data: jsonSubData,
+      ms_list_data: jsonMainData, // main screen
+      ss_list_data: jsonSubData, // sub screen
     };
 
     return res
@@ -318,13 +322,17 @@ module.exports = {
   async getAppScreenDetail(req, res, next) {
     const scCode = req.query.sc_code;
     const user = req.userInfo;
-    const where = `M_MOA_CODE = '${scCode}' AND T_SC_CODE = '${scCode}' AND T_SC_STATUS != 'D'`;
+    const where = `M_MOA_CODE = '${user.u_martid}' AND T_SC_CODE = '${scCode}' AND T_SC_STATUS != 'D'`;
     const isExistData = await queriesHelper.getDataCountWhere(
       "TBL_MOA_APP_SCREENS",
       where
     );
+    //sc_code ko tồn tại
     if (isExistData == 0) {
-      //return error
+      return res
+      .status(200)
+      .json(responseErrorData(1000,'sc_code', messageError.ScreenCodeNotExists));
+
     } else {
     }
     let haveCondition = 1;
@@ -340,6 +348,7 @@ module.exports = {
     let jsonDetailData = [];
 
     for await (const val of appDetailList) {
+      console.log(val.T_SC_DT_TMPL_CODE)
       //banner 01
       if (val.T_SC_DT_TMPL_CODE == "AP00000001") {
         let titleBanner = "";
@@ -356,7 +365,8 @@ module.exports = {
           showTitle = "Yes";
         }
 
-        const styleData = getStyleOfTemplate(dataStyle.tmpl_style_title);
+        const styleData = getStyleOfTemplate(dataStyle.tmpl_style_title); // get font_size, padding, margin, color ,...
+        //get detail data of 1 TEMPLATE
         const dataApp = await composeTypeOneTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
           user.u_martid,
@@ -379,14 +389,15 @@ module.exports = {
         });
       }else  if (val.T_SC_DT_TMPL_CODE == "AP00000002") {
         //event and blog
-        const dataStyle = JSON.parse(val.T_SC_DT_TMPL_DATA)
-        const style = getStyleOfTemplate(dataStyle?.tmpl_style_title)
+        const dataTemplate = JSON.parse(val.T_SC_DT_TMPL_DATA)
+        const style = getStyleOfTemplate(dataTemplate?.tmpl_style_title) // get font_size, padding, margin, color ,...
         let showTitle = "No"
         let title = ''
-        if(dataStyle.tmpl_option_title_display){
+        if(dataTemplate.tmpl_option_title_display){
           showTitle  = 'Yes'
           title = dataTemplate.tmpl_data.title;
         }
+         //get detail data of 2 TEMPLATE
         const dataApp = await composeTypeTwoTemplateData(JSON.parse(val.T_SC_DT_TMPL_DATA), user.u_martid)
         jsonDetailData.push({
           tmpl_code: val.T_SC_DT_TMPL_CODE,
@@ -406,13 +417,48 @@ module.exports = {
 
         })
 
-      } else if (val.T_SC_DT_TMPL_CODE == "AP00000008") {
+      } else if(val.T_SC_DT_TMPL_CODE == "AP00000007"){
+        //category text wrap list not icon
+        const dataTemplate = JSON.parse(val.T_SC_DT_TMPL_DATA)
+        let title = ""
+        let showTitle = "No"
+        const dataStyle = getStyleOfTemplate(val.tmpl_style_title)// get font_size, padding, margin, color ,...
+
+        if(dataTemplate.tmpl_option_title_display){
+          console.log('dataTemplate.tmpl_option_title_display')
+          title = dataTemplate.tmpl_title
+          showTitle = 'Yes'
+        }
+        //get detail data of 7 TEMPLATE
+        const dataApp = await composeTypeSevenTemplateData(
+          dataTemplate,
+          user.u_martid,
+          req.dataConnect.M_DB_CONNECT
+        );
+        jsonDetailData.push({
+          tmpl_code: val.T_SC_DT_TMPL_CODE,
+          tmpl_name: val.T_TMPL_LABEL,
+          tmpl_type: val.T_TMPL_TYPE,
+          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
+          tmpl_smp_img: val.T_TMPL_IMG,
+          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          tmpl_template_title: "",
+          isActive: val.IS_YN === "Y" ? true : false,
+          data_app: dataApp,
+          templateSEQ: val.SEQ,
+          title:title,
+          showTitle : showTitle,
+          styleTitle: dataStyle
+
+        });
+      }  else if (val.T_SC_DT_TMPL_CODE == "AP00000008") {
         //product list for cart
         let titleTemplate = "";
-        dataTemplate = JSON.parse(val.T_SC_DT_TMPL_DATA);
+        const dataTemplate = JSON.parse(val.T_SC_DT_TMPL_DATA);
         if (dataTemplate.tmpl_data?.title) {
           titleTemplate = dataTemplate.tmpl_data.title;
         }
+         //get detail data of 8 TEMPLATE
         const dataApp = await composeTypeEightTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
           user.u_martid,
@@ -433,15 +479,16 @@ module.exports = {
 
         });
       } else if (val.T_SC_DT_TMPL_CODE == "AP00000010") {
-        //category list icon
+        //category slider icon
         const dataStyle = JSON.parse(val.T_SC_DT_TMPL_DATA);
         let title = "";
         let showTitle = "No";
-        let styleData = getStyleOfTemplate(dataStyle.tmpl_style_title);
+        let styleData = getStyleOfTemplate(dataStyle.tmpl_style_title); // get font_size, padding, margin, color ,...
         if (dataStyle.tmpl_option_title_display) {
           title = dataStyle.tmpl_title;
           showTitle = "Yes";
         }
+         //get detail data of 10 TEMPLATE
         const dataApp = await composeTypeTenTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
           user.u_martid,
@@ -465,6 +512,7 @@ module.exports = {
         });
       } else if (val.T_SC_DT_TMPL_CODE == "AP00000013") {
         // search
+         //get detail data of 13 TEMPLATE
         const dataApp = composeTypeThirteenTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
           user.u_martid
@@ -483,6 +531,7 @@ module.exports = {
         });
       }else if (val.T_SC_DT_TMPL_CODE == "AP00000014") {
         // mã vạch
+         //get detail data of 14 TEMPLATE
         const dataApp = composeTypeFourteenTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
           user.u_martid
@@ -501,6 +550,7 @@ module.exports = {
         });
       }else if (val.T_SC_DT_TMPL_CODE == "AP00000015") {
         // coupon
+         //get detail data of 15 TEMPLATE
         const dataApp = await composeTypeFiveteenTemplateData(
           JSON.parse(val.T_SC_DT_TMPL_DATA),
           user.u_martid

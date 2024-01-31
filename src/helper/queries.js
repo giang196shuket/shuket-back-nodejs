@@ -7,7 +7,7 @@ module.exports = class queriesHelper {
           try {
           let  sql = `SELECT COUNT(SEQ) AS COUNT FROM ${table} WHERE ${where}`;
 
-          // logger.writeLog("info", `${logBase} : ${sql}`);
+          // logger.writeLog("info", `${logBase} :  ${sql}`);
           const [row] = await pool.mysqlPool.query(sql);
           return row[0].COUNT
         } catch (error) {
@@ -21,7 +21,7 @@ module.exports = class queriesHelper {
           try {
           let  sql = `SELECT *  FROM ${table} WHERE ${where}`;
 
-          logger.writeLog("info", `${logBase} : ${sql}`);
+          // logger.writeLog("info", `${logBase} : ${sql}`);
           const [rows] = await pool.mysqlPool.query(sql);
           return rows[0]
         } catch (error) {
