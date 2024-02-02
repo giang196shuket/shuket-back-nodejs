@@ -3,7 +3,7 @@ const { responseSuccess, responseDataList } = require("../../helper/response");
 const { requsetSearchListDate } = require("../../helper/request");
 const queriesHelper = require("../../helper/queries");
 const { MART_HIDE_CHANGE_STATUS_ORDER, DELIVERY_PUSH_TYPE, MART_USE_DELIVERY_PUSH, textDeFault, days, MART_USE_DELIVERY_FEE, DELIVERY_FEE } = require("../../helper/const");
-const { getLimitQuery, generateTimePickup } = require("../../helper/funtion");
+const { getLimitQuery, generateTimePickup, assignSequentialNumbers } = require("../../helper/funtion");
 const orderModel = require("../../model/order/order");
 const moment = require("moment");
 module.exports = {
@@ -64,7 +64,33 @@ module.exports = {
     }
     const jsonResponseData = []
     for (const val of listOrder.list) {
-        // bỏ qua màu sắc
+        // lấy  màu sắc status
+        let statusColorBox = ""
+        let statusColorText = ""
+        if(val.O_STATUS === 60 || val.O_STATUS === 61 || val.O_STATUS === 62 || val.O_STATUS === 63 || val.O_STATUS === 64){
+            statusColorBox = '#2468ae'
+        }else if(val.O_STATUS === 70 || val.O_STATUS === 71){
+            statusColorBox = '#850075'
+        }else if(val.O_STATUS === 80 || val.O_STATUS === 81  || val.O_STATUS === 82 || val.O_STATUS === 90 || val.O_STATUS === 91  || val.O_STATUS === 92){
+            statusColorBox = '#00c334'
+        }else if(val.O_STATUS === 83){
+            statusColorBox = '#ea781c'
+        }else{
+            statusColorBox = '#e4d03f'
+        }
+        //màu text
+        if(val.O_STATUS === 70 || val.O_STATUS === 82 || val.O_STATUS === 32 || val.O_STATUS === 42 || val.O_STATUS === 92){
+            statusColorText = '#00c334'
+        }else if(val.O_STATUS === 60 || val.O_STATUS === 80 || val.O_STATUS === 30 || val.O_STATUS === 40 || val.O_STATUS === 90){
+            statusColorText = '#aaaaaa'
+        }else if(val.O_STATUS === 61 || val.O_STATUS === 33  || val.O_STATUS === 43 || val.O_STATUS === 93){
+            statusColorText = '#ff0000'
+        }else if(val.O_STATUS === 63 || val.O_STATUS === 62  || val.O_STATUS === 81 || val.O_STATUS === 31 || val.O_STATUS === 41 || val.O_STATUS === 71 || val.O_STATUS === 91 ){
+            statusColorText = '#ff8c29'
+        }else if(val.O_STATUS === 64){
+            statusColorBox = '#b4b800'
+        }
+
         // lấy địa chỉ giao hàng
         let address = ''
         if(val.U_ADDR_RA){
@@ -318,6 +344,7 @@ module.exports = {
        jsonResponseData.push({
          orderCode: val.O_CODE,
          orderCustomer: usernameOrder,
+         orderCustomerPhone: val.U_ADDR_PHONE,
          orderGoodName: val.OD_GOODS_NAME,
          orderGoodCNT: val.OD_GOODS_CNT,
          orderDate: moment(val.C_TIME).format('YYYY-MM-DD HH:mm:ss'),
@@ -359,7 +386,9 @@ module.exports = {
          deliveryDate: val.DELIVERY_DATE ? moment(val.DELIVERY_DATE).format('YYYY-MM-DD') : "",
          orderAddressDistrict: val.U_ADDR_CITY,
          orderAddressCity: val.U_ADDR_STATE,
-         productList: productList
+         statusColorBox: statusColorBox,
+         statusColorText:statusColorText,
+         productList: assignSequentialNumbers(productList)
        })
     }
     let jsonDataGroup = {}

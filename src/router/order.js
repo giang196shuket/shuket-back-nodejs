@@ -7,7 +7,7 @@ const  middleware  = require("../middleware/auth");
 var router = express.Router();
 
 //order list
-router.get("/get_order_list", middleware.verifyToken, controllerOrder.getOrderList);
+router.post("/get_order_list", middleware.verifyToken, controllerOrder.getOrderList);
 router.get("/get_list_payment_cart", middleware.verifyToken, controllerOrder.getListPaymentCart);
 router.get("/get_list_status_order", middleware.verifyToken, controllerOrder.getListStatusOrder);
 router.get("/get_list_delivery_time", middleware.verifyToken, controllerOrder.getListDeliveryTime);
