@@ -307,7 +307,7 @@ module.exports = {
         cartName = val.NICE_CARDNAME
        }
        if(val.O_PAY_METHOD === 'SKP'){
-        //shuket pay
+        ////shuket pay
         cartName = val.NICE_EASYBANKNAME
        }else{
         cartName = val.NICE_CARDNAME
