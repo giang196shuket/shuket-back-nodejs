@@ -312,6 +312,9 @@ module.exports = {
        }else{
         cartName = val.NICE_CARDNAME
        }
+       // get product list of order
+       const productList = await orderModel.getOrderDetailData(val.O_CODE, req.userInfo.u_martid, req.dataConnect)
+
        jsonResponseData.push({
          orderCode: val.O_CODE,
          orderCustomer: usernameOrder,
@@ -356,6 +359,7 @@ module.exports = {
          deliveryDate: val.DELIVERY_DATE ? moment(val.DELIVERY_DATE).format('YYYY-MM-DD') : "",
          orderAddressDistrict: val.U_ADDR_CITY,
          orderAddressCity: val.U_ADDR_STATE,
+         productList: productList
        })
     }
     let jsonDataGroup = {}

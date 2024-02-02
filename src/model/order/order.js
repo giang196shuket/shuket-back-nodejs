@@ -640,16 +640,16 @@ FROM TBL_MOA_ORD_MAIN AS OD
               AND MOG.GOODS_CODE = PD.P_CODE
               AND MOG.BRCD = PD.P_BARCODE
           )
-      WHERE OD.O_CODE = ${orderCode}
-      AND OD.M_MOA_CODE = ${martid}
-      AND OT.M_MOA_CODE = ${martid}
-      AND PD.M_MOA_CODE = ${martid}
+      WHERE OD.O_CODE = '${orderCode}'
+      AND OD.M_MOA_CODE = '${martid}'
+      AND OT.M_MOA_CODE = '${martid}'
+      AND PD.M_MOA_CODE = '${martid}'
       AND PD.P_STATUS != 'D'
       AND OT.O_CANCEL_STATUS = 'C'
       Group by OT.SEQ) AS SUB
       ORDER BY SUB.P_CAT,SUB.P_CAT_MID,SUB.P_CAT_SUB`;
 
-      logger.writeLog("info", `${logBase} : ${sql}`);
+      // logger.writeLog("info", `${logBase} : ${sql}`);
       const [list] = await pool.mysqlPool.query(sql);
 
       return list
