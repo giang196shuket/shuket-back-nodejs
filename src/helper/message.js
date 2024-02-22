@@ -1,5 +1,6 @@
  const messageSuccess = {
-    Success : 'Your request is successful'
+    Success : 'Your request is successful',
+    updateSuccess: "Updated data",
 }
 
  const messageError = {

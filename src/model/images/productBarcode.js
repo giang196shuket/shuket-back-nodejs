@@ -4,8 +4,8 @@ const moment = require("moment");
 
 module.exports = class productNoBarcodeModel {
  
-  static async getListProductWithoutBarcode(limitQuery,  orderBy, keywordType, keywordValue, dateStart, dateEnd , status) {
-    let logBase = `models/productNoBarcodeModel.getListProductWithoutBarcode`;
+  static async getListProductWithBarcode(limitQuery,  orderBy, keywordType, keywordValue, dateStart, dateEnd , status) {
+    let logBase = `models/productNoBarcodeModel.getListProductWithBarcode`;
     
     try {
       let where = ' '

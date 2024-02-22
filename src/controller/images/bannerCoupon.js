@@ -1,7 +1,7 @@
 const { getLimitQuery } = require("../../helper/funtion");
 const { messageSuccess } = require("../../helper/message");
 const { getDataFieldFrom } = require("../../helper/queries");
-const { responseSuccess } = require("../../helper/response");
+const { responseSuccess, responseDataList } = require("../../helper/response");
 const { generateBannerCodeForMart, removeTypeFileOfName, getSize } = require("../../helper/upload");
 const imagesBannerCouponModel = require("../../model/images/bannerCoupon");
 const { s3 } = require("../../service/uploadS3");
@@ -10,17 +10,17 @@ const { s3 } = require("../../service/uploadS3");
 module.exports = {
 
   async getImages(req, res, next) {
-    let { page, per_page, filter_order,  filter_status,  image_type,  image_cate,  key_type,  key_value } = req.body;
+    let { page, limit, filter_order,  filter_status,  image_type,  image_cate,  key_type,  key_value } = req.body;
 
-    console.log(page, per_page)
+    console.log(page, limit)
     if(!page){
         page = 1
     }
-    if(!per_page){
-        per_page = 10
+    if(!limit){
+      limit = 10
     }
-    if(per_page > 100){
-        per_page = 10
+    if(limit > 100){
+      limit = 10
     }
     
     if(filter_order && (filter_order != 'RD' && filter_order != 'RA')){
@@ -34,7 +34,7 @@ module.exports = {
         //C: COUPON
         return null
     }
-    let limitQuery = getLimitQuery(page, per_page)
+    let limitQuery = getLimitQuery(page, limit)
     const listData = await imagesBannerCouponModel.getImages(limitQuery, filter_order, filter_status, image_type, image_cate, key_type, key_value)
     const cateData = await imagesBannerCouponModel.getCateListData()
 
@@ -74,13 +74,9 @@ module.exports = {
             bnr_name_old: val.CI_NAME
         })
     }
-
     const responseData = {
-        cur_page: page,
-        cur_per_page: per_page,
-        total_list_cnt: listData.length,
-        list_data: jsonResponseData,
-        cate_images_list: cateData
+      ...responseDataList(page, limit, listData.total, jsonResponseData),
+      cateImagesList: cateData
     }
     return res
     .status(200)
