@@ -22,7 +22,7 @@ module.exports = class martModel {
     try {
       let sql = ` SELECT
         MB.SEQ AS MART_SEQ, MB.SP_CODE, MB.SPT_CODE, MB.M_MOA_CODE, MC.M_POS_REGCODE, MB.M_NAME AS MART_NAME, 
-        MB.M_DISTRICT AS DISTRICT_NAME, MB.C_TIME,
+        MB.M_DISTRICT AS DISTRICT_NAME, MB.C_TIME, MB.M_LOGO,
         '0' AS SUBSCR_CNT,
         '0' AS SUBSCR_PAYMENT,
         '0' AS COLLECTED,

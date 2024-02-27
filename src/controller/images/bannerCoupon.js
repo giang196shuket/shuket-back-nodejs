@@ -1,16 +1,17 @@
 const { getLimitQuery } = require("../../helper/funtion");
 const { messageSuccess } = require("../../helper/message");
+const queriesHelper = require("../../helper/queries");
 const { getDataFieldFrom } = require("../../helper/queries");
 const { responseSuccess, responseDataList } = require("../../helper/response");
 const { generateBannerCodeForMart, removeTypeFileOfName, getSize } = require("../../helper/upload");
 const imagesBannerCouponModel = require("../../model/images/bannerCoupon");
 const { s3 } = require("../../service/uploadS3");
-
+const moment = require("moment");
 
 module.exports = {
 
   async getImages(req, res, next) {
-    let { page, limit, filter_order,  filter_status,  image_type,  image_cate,  key_type,  key_value } = req.body;
+    let { page, limit, orderBy,  status,  imageType,  imageCategory,  keywordType,  keywordValue } = req.body;
 
     console.log(page, limit)
     if(!page){
@@ -23,19 +24,19 @@ module.exports = {
       limit = 10
     }
     
-    if(filter_order && (filter_order != 'RD' && filter_order != 'RA')){
-        //RD: sort by desc
-        //RA: sort by asc
+    if(orderBy && (orderBy != 'newest' && orderBy != 'oldest')){
+        //newest: sort by desc
+        //oldest: sort by asc
         return null
     }
 
-    if(image_type && (image_type != 'B' && image_type != 'C')){
+    if(imageType && (imageType != 'B' && imageType != 'C')){
         //B: BANNER
         //C: COUPON
         return null
     }
     let limitQuery = getLimitQuery(page, limit)
-    const listData = await imagesBannerCouponModel.getImages(limitQuery, filter_order, filter_status, image_type, image_cate, key_type, key_value)
+    const listData = await imagesBannerCouponModel.getImages(limitQuery, orderBy, status, imageType, imageCategory, keywordType, keywordValue)
     const cateData = await imagesBannerCouponModel.getCateListData()
 
     let jsonResponseData = []
@@ -54,24 +55,24 @@ module.exports = {
             typeImageEN = "Coupon"
         }
         jsonResponseData.push({
-            bnr_code:  val.SEQ,
-            bnr_name: val.CI_NAME,
-            bnr_type : typeImage,
-            bnr_type_en : typeImageEN,
-            bnr_cate: val.C_KO,
-            bnr_cate_en: val.C_ENG,
-            bnr_image: val.CI_URI,
-            bnr_file_nm: val.CI_FILE,
-            bnr_use_flg: val.CI_STATUS,
-            c_time: val.C_TIME,
-            c_admin:val.C_ID,
-            m_time: val.M_TIME,
-            m_admin: val.M_ID,
+            code:  val.SEQ,
+            name: val.CI_NAME,
+            typeImage : typeImage,
+            typeImageEN : typeImageEN,
+            category: val.C_KO,
+            categoryEn: val.C_ENG,
+            image: val.CI_URI,
+            file: val.CI_FILE,
+            status: val.CI_STATUS,
+            cTime: val.C_TIME,
+            cId:val.C_ID,
+            mTime: val.M_TIME,
+            mId: val.M_ID,
             type: val.CI_TYPE,
-            type_cate: val.CI_THEME,
-            type_old: val.CI_TYPE,
-            type_cate_old: val.CI_THEME,
-            bnr_name_old: val.CI_NAME
+            typeCate: val.CI_THEME,
+            typeOld: val.CI_TYPE,
+            typeCateOld: val.CI_THEME,
+            nameOld: val.CI_NAME
         })
     }
     const responseData = {
@@ -152,5 +153,18 @@ module.exports = {
     return res
     .status(200)
     .json(responseSuccess(200, messageSuccess.Success,responseData));
-  }
+  },
+  async updateBannerStatusImgs(req, res, next) {
+    let { code, status } = req.body;
+    const time = moment().format("YYYY-MM-DD HH:mm:ss");
+     await queriesHelper.updateTableWhere(
+      "TBL_MOA_IMAGES_COMMON",
+      ` CI_STATUS = '${status}', M_ID = '${req.userInfo.user_id}',
+          M_TIME = '${time}'`,
+      ` SEQ = '${code}' `
+    );
+    return res
+    .status(200)
+    .json(responseSuccess(200, messageSuccess.Success, messageSuccess.updateSuccess));
+  },
 };

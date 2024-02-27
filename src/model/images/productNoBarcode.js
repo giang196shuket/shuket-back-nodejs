@@ -38,6 +38,7 @@ module.exports = class productBarcodeModel {
 
 
       let sql = ` SELECT
+      MIP.IM_CODE AS id,
       MIP.IM_CODE AS code
       ,MIP.IM_NAME as name
       ,MIP.IM_URI as uri

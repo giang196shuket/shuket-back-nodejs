@@ -5,45 +5,39 @@ const { generateBannerCodeForMart } = require("../../helper/upload");
 
 module.exports = class imagesBannerCouponModel {
   static async getImages(
-    limitQuery,
-    filterOrder,
-    filterStatus,
-    imageType,
-    imageCate,
-    keyType,
-    keyValue
+    limitQuery, orderBy, status, imageType, imageCategory, keywordType, keywordValue
   ) {
     let logBase = `models/imagesBannerCouponModel.getImages:`;
     try {
       let where = "";
-      if (filterStatus) {
+      if (status) {
         //A : ACTIVE, C: DEACTIVE, D: DELETE
-        where += ` AND MIC.CI_STATUS = '${filterStatus}'  AND MIC.CI_STATUS!='D' `;
+        where += ` AND MIC.CI_STATUS = '${status}'  AND MIC.CI_STATUS!='D' `;
       } else {
         where += ` AND MIC.CI_STATUS!='D' `;
       }
       if (imageType) {
         where += ` AND MIC.CI_TYPE = '${imageType}'  `;
       }
-      if (keyType) {
+      if (keywordType) {
         //search theo tên image
-        if (keyType === "br_name" && keyValue != "") {
-          where += ` AND MIC.CI_NAME LIKE  '%"${keyValue}"%'  `;
+        if (keywordType === "br_name" && keywordValue != "") {
+          where += ` AND MIC.CI_NAME LIKE  '%"${keywordValue}"%'  `;
         }
         // search theo tên file của image
-        if (keyType === "ig_name" && keyValue != "") {
-          where += ` AND MIC.CI_FILE LIKE  '%"${keyValue}"%'  `;
+        if (keywordType === "ig_name" && keywordValue != "") {
+          where += ` AND MIC.CI_FILE LIKE  '%"${keywordValue}"%'  `;
         }
       }
-      if (imageCate) {
+      if (imageCategory) {
         //search theo thể loại của image
-        where += ` AND MIC.CI_THEME = '${imageCate}'  `;
+        where += ` AND MIC.CI_THEME = '${imageCategory}'  `;
       }
 
-      if (filterOrder === "RA") {
+      if (orderBy === "oldest") {
         //asc
         where += ` ORDER BY MIC.SEQ ASC `;
-      } else if (filterOrder === "RD") {
+      } else if (orderBy === "newest") {
         //desc
         where += ` ORDER BY MIC.SEQ DESC `;
       } else {

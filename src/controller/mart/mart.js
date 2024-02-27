@@ -11,8 +11,8 @@ const { requsetSearchList } = require("../../helper/request");
 
 
 module.exports = {
-  async moaSearchList(req, res, next) {
-    const logBase = `controller/mart/moaSearchList: `;
+  async getMoaMartList(req, res, next) {
+    const logBase = `controller/mart/getMoaMartList: `;
 
     const params = requsetSearchList(req.body,['appType','isSyncOrder','useStock'])
     const offset =  params.page * params.limit - params.limit;
@@ -41,6 +41,7 @@ module.exports = {
         mart_code: row.M_MOA_CODE,
         pos_regcode: row.M_POS_REGCODE,
         mart_name: row.MART_NAME,
+        logo_url: row.M_LOGO ?  loadImageAws(row.M_LOGO, bucketImage.martlogo) : "",
         city_name: {
           en: row.CT_NAME_EN,
           kr: row.CT_NAME_KR,

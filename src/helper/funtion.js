@@ -55,7 +55,7 @@ function assignSequentialNumbers(list) {
   // Duyệt qua từng phần tử trong danh sách
   for (let i = 0; i < list.length; i++) {
       // Gán số thứ tự và tăng biến đếm
-      list[i].id = counter;
+      list[i].seq = counter;
       counter++;
   }
   return list
@@ -90,6 +90,10 @@ function generateTimePickup(C_TIME, O_PICKUP_TIME, addDay) {
     );
   }
 }
+function convertArrayToStringForWhereIn(arr) {
+  return arr.map(item => `'${item}'`).join(', ');
+}
+
 //dùng generate tag cho product // /tages :[]
 function generateTag(tages) {
   return tages.map((tag) => "#" + tag).join("");
@@ -177,6 +181,7 @@ function arrayColumnAssign(data, columnName, indexName) {
 }
 
 module.exports = {
+  convertArrayToStringForWhereIn,
   countCharacter,
   stringLimitWords,
   getLimitQuery,
