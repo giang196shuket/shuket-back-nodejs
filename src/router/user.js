@@ -10,6 +10,7 @@ var router = express.Router();
 router.post("/search_list",  middleware.verifyToken, controllerAccount.getUserSearchList);
 router.get("/get_progs_role_by_id",  middleware.verifyToken, controllerAccount.getProgsRoleById);
 router.get("/search_level_list",  middleware.verifyToken, controllerLevel.getLevelSearchList);
+router.post("/check_users_admin_id",  middleware.verifyToken, controllerAccount.checkUserAdminId);
 
 
 module.exports = router;

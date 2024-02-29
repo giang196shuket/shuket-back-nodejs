@@ -2,7 +2,10 @@
     Success : 'Your request is successful',
     updateSuccess: "Updated data",
 }
-
+const messageOrther = {
+   IdExist : 'Id already exists',
+   IdNotExist: "Id valid",
+}
  const messageError = {
    ScreenCodeNotExists: "The screen code not exists in the system",
    InvalidMethod:"Invalid http method", //405
@@ -20,4 +23,4 @@
    Suspened:'Sorry, Your account is suspened. Please contact our customer support team.'
 }
 
-module.exports = {messageSuccess, messageError} 
+module.exports = {messageSuccess, messageError, messageOrther} 

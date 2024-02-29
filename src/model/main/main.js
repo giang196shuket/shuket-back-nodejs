@@ -166,8 +166,8 @@ module.exports = class mainModel {
 
  
   //GROUP_MAIN, TOGETHER
-  static async getMartCommonWhere() {
-    let logBase = `models/martModel.getMartCommonWhere:`;
+  static async getDBConnect() {
+    let logBase = `models/martModel.getDBConnect:`;
 
     const sql = `SELECT
       C_CODE, C_KO, C_ENG
@@ -226,7 +226,7 @@ module.exports = class mainModel {
     let logBase = `models/userModel.getLevelOptions:`;
       try {
         const  sql = ` SELECT
-        UL.SEQ AS SEQ, UL.U_LEVEL_CODE AS CODE, UL.U_LEVEL_TITLE AS NAME
+        UL.SEQ AS SEQ, UL.U_LEVEL_CODE AS code, UL.U_LEVEL_TITLE AS name
     FROM
         TBL_MOA_USERS_LEVEL UL WHERE UL.U_LEVEL_STATUS = 'A' `;
 
@@ -241,7 +241,7 @@ module.exports = class mainModel {
     let logBase = `models/userModel.getGroupOptions:`;
       try {
         const  sql = ` SELECT
-        UG.SEQ AS SEQ, UG.U_GROUP_CODE AS CODE, UG.U_GROUP_TITLE AS NAME
+        UG.SEQ AS SEQ, UG.U_GROUP_CODE AS code, UG.U_GROUP_TITLE AS name
     FROM
         TBL_MOA_USERS_GROUP UG WHERE UG.U_GROUP_STATUS = 'A' `;
 

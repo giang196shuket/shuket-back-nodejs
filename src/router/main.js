@@ -18,7 +18,7 @@ router.get("/get_left_menu_bar",  middleware.verifyToken, controller.getLeftMenu
 router.get("/get_city_options",  middleware.verifyToken, controller.getCityOptions);
 router.get("/get_district_options",  middleware.verifyToken, controller.getDistrictOptions);
 //data for of filter search mart list
-router.get("/get_mart_common_where", middleware.verifyToken, controller.getMartCommonWhere);
+router.get("/get_db_connect", middleware.verifyToken, controller.getDBConnect);
 //for partner
 router.get("/get_partner_options",  middleware.verifyToken, controller.getPartnerOptions);
 router.get("/get_partner_sales_team_options",  middleware.verifyToken, controller.getPartnerSalesTeamOptions);

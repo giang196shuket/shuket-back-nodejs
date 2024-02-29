@@ -38,7 +38,7 @@ module.exports = {
                 contentsID: actualData.T_CATE_CODE,
                 cateName: stringLimitWords(actualData.P_CAT, 4),
                 imageUseFlg: "Y",
-                imageUrl:   loadImageAws(actualData.T_CATE_IMG_CV, bucketImage.banner)
+                imageUrl:   await loadImageAws(actualData.T_CATE_IMG_CV, bucketImage.banner)
               });
             } else if (
               (actualData.T_CATE_IMG_USE = "D" && actualData.T_CATE_IMG_DATA)

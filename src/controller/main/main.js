@@ -20,13 +20,13 @@ module.exports = {
       dataResponse.user_level = userProfile.U_LEVEL;
       dataResponse.user_status = userProfile.U_STATUS;
       if (userProfile.M_LOGO !== "") {
-        dataResponse.mart_logo = loadImageAws(
+        dataResponse.mart_logo = await loadImageAws(
           userProfile.M_LOGO,
           bucketImage.martlogo
         );
       }
       if (userProfile.M_LOGO_PUSH !== "") {
-        dataResponse.mart_logo_push =  loadImageAws(
+        dataResponse.mart_logo_push =  await loadImageAws(
           userProfile.M_LOGO_PUSH,
           bucketImage.martlogo
         );
@@ -51,13 +51,13 @@ module.exports = {
       dataResponse.user_status = "A";
       const martSwitch = await mainModel.getMartInfoSwitch(user.u_martid);
       if (martSwitch.M_LOGO !== "") {
-        dataResponse.mart_logo = loadImageAws(
+        dataResponse.mart_logo = await loadImageAws(
           martSwitch.M_LOGO,
           bucketImage.martlogo
         );
       }
       if (martSwitch.M_LOGO_PUSH !== "") {
-        dataResponse.mart_logo_push = loadImageAws(
+        dataResponse.mart_logo_push = await loadImageAws(
           martSwitch.M_LOGO_PUSH,
           bucketImage.martlogo
         );
@@ -170,7 +170,7 @@ module.exports = {
       },
     }));
     const dataResponse = {
-      list_type_mart: listType,
+      list: listType,
     };
     return res
       .status(200)
@@ -186,7 +186,7 @@ module.exports = {
       },
     }));
     const dataResponse = {
-      list_cities: listCity,
+      list: listCity,
     };
     return res
       .status(200)
@@ -204,7 +204,7 @@ module.exports = {
       },
     }));
     const dataResponse = {
-      list_districts: listDistricts,
+      list: listDistricts,
     };
     return res
       .status(200)
@@ -219,7 +219,7 @@ module.exports = {
       name: item.SP_NAME,
     }));
     const dataResponse = {
-      list_partners: listPartners,
+      list: listPartners,
     };
     return res
       .status(200)
@@ -235,7 +235,7 @@ module.exports = {
       name: item.SPT_NAME,
     }));
     const dataResponse = {
-      list_sales_team: listSalestTeam,
+      list: listSalestTeam,
     };
     return res
       .status(200)
@@ -250,7 +250,7 @@ module.exports = {
       name: item.POS_NAME,
     }));
     const dataResponse = {
-      list_pos: listPos,
+      list: listPos,
     };
     return res
       .status(200)
@@ -258,14 +258,16 @@ module.exports = {
   },
 
   // GROUP_MAIN, TOGETHER
-  async getMartCommonWhere(req, res, next) {
-    const data = await mainModel.getMartCommonWhere();
+  async getDBConnect(req, res, next) {
+    const data = await mainModel.getDBConnect();
     const listDBPos = await data.map((item) => ({
       moa_common_code: item.C_CODE,
       moa_common_name_ko: item.C_KO,
       moa_common_name_en: item.C_ENG,
     }));
-    const dataResponse = listDBPos;
+    const dataResponse = {
+      list: listDBPos,
+    };    
     return res
       .status(200)
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));

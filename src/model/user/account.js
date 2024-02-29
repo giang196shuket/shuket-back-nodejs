@@ -1,10 +1,26 @@
 const pool = require("../../../config/database");
 const logger = require("../../../config/logger");
 const moment = require("moment");
+const uniqid = require("uniqid");
 
 module.exports = class userModel {
 
+  //insert account mart when create mart
+  static async insertAccountMart({u_id, u_password, u_password_confirm, add_group, add_level}, time, userId, mart_code){
+    let logBase = `models/martModel.insertAccountMart: `;
+    try {
+    let  sql = ` INSERT INTO TBL_MOA_USERS_ADMIN  
+    (U_ID, U_ACC, U_PWD, U_MARTID, U_STATUS, U_GROUP, U_LEVEL, C_TIME, C_ID) VALUES 
+    ('${uniqid('UA')}', '${u_id}', '${u_password}','${mart_code}', 'A', '${add_group}','${add_level}','${time}', '${userId}')`;
 
+    logger.writeLog("info", `${logBase} : ${sql}`);
+    const [rows] = await pool.mysqlPool.query(sql);
+    return rows.affectedRows
+  } catch (error) {
+    logger.writeLog("error", `${logBase} : ${error.stack}`);
+    return 0
+  }
+}
   static async getUserSearchList(mart, levelId, group, level, orderBy, keywordType, keywordValue, dateStart, dateEnd , page, limit, offset) {
     let logBase = `models/userModel.getUserSearchList:`;
       try {

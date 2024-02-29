@@ -43,7 +43,7 @@ module.exports = {
       fcm_name: item.FCM_NAME
     }));
     const dataResponse = {
-        list_fcm: listFcm,
+        list: listFcm,
     };
     return res
     .status(200)

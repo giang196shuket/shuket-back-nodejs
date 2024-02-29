@@ -32,7 +32,7 @@ module.exports = {
                 }
             }else{
                 templateDataArr = {
-                    img_banner :  loadImageAws(actualData.T_BNR_IMAGE, bucketImage.banner),
+                    img_banner :  await loadImageAws(actualData.T_BNR_IMAGE, bucketImage.banner),
                     img_width :  actualData.T_BNR_IMAGE_WD,
                     img_height :actualData.T_BNR_IMAGE_HT
                 }

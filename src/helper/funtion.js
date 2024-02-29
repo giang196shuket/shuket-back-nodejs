@@ -49,6 +49,32 @@ function getLimitQuery(page, limit) {
 
   return ` LIMIT ${start}, ${limit}`;
 }
+//generate topic fcm khi tạo mart mới
+function generateNewTopic(mart_code, mart_name){
+   return [
+    {
+      NT_TPC_CODE : "TP" + mart_code.substr(-4) +"0000",
+      NT_TPC_GRP : mart_name + " 전체",
+      NT_TPC_NAME :  mart_code.substr(-4)+"0000",
+      NT_TPC_STATUS: 'A',
+      NT_TPC_TYPE: 'A'
+    },
+    {
+      NT_TPC_CODE : "TP" + mart_code.substr(-4) +"0001",
+      NT_TPC_GRP : mart_name + " 식자재",
+      NT_TPC_NAME :  mart_code.substr(-4)+"0001",
+      NT_TPC_STATUS: 'A',
+      NT_TPC_TYPE: 'B'
+    },
+    {
+      NT_TPC_CODE : "TP" + mart_code.substr(-4) +"0002",
+      NT_TPC_GRP : mart_name + " 개별전송",
+      NT_TPC_NAME :  "",
+      NT_TPC_STATUS: 'A',
+      NT_TPC_TYPE: 'D'
+    }
+   ]
+}
 //generate STT cho 1 list 
 function assignSequentialNumbers(list) {
   let counter = 1;
@@ -156,6 +182,12 @@ function arrayColumn(rows, columnName) {
   // ]
   // RESULT: ['ABC', 'DEF', 'GHI'];
 }
+// tạo mart code mới khi tạo mart
+function generateNextMoaCode(code) {
+  const num = parseInt(code.replace('M', '')) + 1;
+  let returnStr = 'M' + num.toString().padStart(8, '0');
+  return returnStr;
+}
 
 //tạo ra object mới có giá trị của filed này ứng với field khác
 function arrayColumnAssign(data, columnName, indexName) {
@@ -181,6 +213,8 @@ function arrayColumnAssign(data, columnName, indexName) {
 }
 
 module.exports = {
+  generateNextMoaCode,
+  generateNewTopic,
   convertArrayToStringForWhereIn,
   countCharacter,
   stringLimitWords,

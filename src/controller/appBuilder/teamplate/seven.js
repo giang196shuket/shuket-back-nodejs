@@ -22,7 +22,7 @@ module.exports = {
                     contentsID: actualData.T_CATE_CODE,
                     cateName: actualData.P_CAT,
                     imageUseFlg: 'Y',
-                    imageUrl : getCommonImageJsonData(1, loadImageAws(actualData.T_CATE_IMG_CV, bucketImage.banner, null, actualData.T_CATE_IMG_WD, actualData.T_CATE_IMG_HT)),
+                    imageUrl : getCommonImageJsonData(1, await loadImageAws(actualData.T_CATE_IMG_CV, bucketImage.banner, null, actualData.T_CATE_IMG_WD, actualData.T_CATE_IMG_HT)),
                     haveImage : 1,
                     colorCate : countIndex % 2 ? "#ffd961" : "#f79366"
                 })

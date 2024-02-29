@@ -51,8 +51,53 @@ const days = {
   'Sat': 6,
   'Sun': 7
 };
+const appBottomMenu =[
+  {
+    T_TB_CODE :"TB00000000",
+    T_TB_TITLE: "포인트",
+    T_TB_ICON: "barcode",
+    T_TB_STATUS: 'A'
+  },
+  {
+    T_TB_CODE :"TB00000001",
+    T_TB_TITLE: "쿠폰",
+    T_TB_ICON: "coupon",
+    T_TB_STATUS: 'A'
+  },
+  {
+    T_TB_CODE :"TB00000002",
+    T_TB_TITLE: "위시리스트",
+    T_TB_ICON: "favorite",
+    T_TB_STATUS: 'P'
+  },
+  {
+    T_TB_CODE :"TB00000003",
+    T_TB_TITLE: "장바구니",
+    T_TB_ICON: "cart",
+    T_TB_STATUS: 'A'
+  },
+  {
+    T_TB_CODE :"TB00000004",
+    T_TB_TITLE: "스캔",
+    T_TB_ICON: "scan",
+    T_TB_STATUS: 'C'
+  },
+  {
+    T_TB_CODE :"TB00000005",
+    T_TB_TITLE: "검색내역",
+    T_TB_ICON: "history",
+    T_TB_STATUS: 'P'
+  },
+  {
+    T_TB_CODE :"TB00000006",
+    T_TB_TITLE: "알림함",
+    T_TB_ICON: "push",
+    T_TB_STATUS: 'A'
+  },
+]
 
 module.exports = {
+  appBottomMenu,
   arrayTypeSingle,
   arrayTypeAnotherApp,
   bannerDefault,

@@ -29,7 +29,7 @@ module.exports = {
                         contentsID : actualData.B_CODE,
                         contentsTitle: moment(actualData.C_TIME).format('DD-MM-YYYY'),
                         contentsDescription: description,
-                        imageUrl: getCommonImageJsonData(1, loadImageAws(actualData.B_IMG_CV,bucketImage.notice),null, null , null),
+                        imageUrl: getCommonImageJsonData(1, await loadImageAws(actualData.B_IMG_CV,bucketImage.notice),null, null , null),
                         index_position: iRun,
                         class : activeClass
                     })

@@ -5,6 +5,7 @@ const configAws = {
     domain_local: "http://18.136.76.42/lime_back/",
     domain_ftp: "/", // Not used in the provided PHP code
     s3_domain: "https://s3.ap-northeast-2.amazonaws.com",
+    s3_domain_nodejs: "https://shuket-admin.s3.ap-southeast-2.amazonaws.com", // giang S3
     s3_bucket: "moa.images",
     time_rand: true,
     check_mime: true,

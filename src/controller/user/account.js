@@ -1,5 +1,5 @@
 const userModel = require("../../model/user/account");
-const { messageSuccess } = require("../../helper/message");
+const { messageSuccess, messageOrther } = require("../../helper/message");
 const { responseSuccess, responseDataList } = require("../../helper/response");
 const { assignSequentialNumbers } = require("../../helper/funtion");
 const queriesHelper = require("../../helper/queries");
@@ -34,6 +34,21 @@ module.exports = {
     return res
       .status(200)
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
+  },
+  async checkUserAdminId(req, res, next) {
+    let {u_id} = req.body
+
+    const user = await queriesHelper.getRowDataWhere('TBL_MOA_USERS_ADMIN',` U_ACC = '${u_id}' AND U_STATUS != 'C' `)
+    if(user){
+      return res
+      .status(200)
+      .json(responseSuccess(200, messageOrther.IdExist, true));
+    }else{
+      return res
+      .status(200)
+      .json(responseSuccess(200, messageOrther.IdNotExist, false));
+    }
+
   },
   async getProgsRoleById(req, res, next) {
     let {user_id} = req.query

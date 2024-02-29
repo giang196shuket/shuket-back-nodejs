@@ -113,8 +113,8 @@ module.exports = {
         moaCode : row.M_MOA_CODE,
         bizhourOpen : bizhourArr[0],
         bizhourClose : bizhourArr[1],
-        bannerAppUrl : row.M_BANNER_APP ? loadImageAws(row.M_BANNER_APP , bucketImage.bannerapp) : loadImageAws(bannerDefault , bucketImage.bannerapp),
-        logoAppUrl : row.M_LOGO_APP ? loadImageAws(row.M_LOGO_APP , bucketImage.logoapp) : loadImageAws(row.M_LOGO , bucketImage.logoapp),
+        bannerAppUrl : row.M_BANNER_APP ? await loadImageAws(row.M_BANNER_APP , bucketImage.bannerapp) : await loadImageAws(bannerDefault , bucketImage.bannerapp),
+        logoAppUrl : row.M_LOGO_APP ? await loadImageAws(row.M_LOGO_APP , bucketImage.logoapp) : await loadImageAws(row.M_LOGO , bucketImage.logoapp),
         phone: row.M_PHONE,
         martIntroApp : row.M_INTRO_APP ? row.M_INTRO_APP : row.M_NAME + textDeFault.intro1 + row.M_NAME + textDeFault.intro2,
         notice: noticeList, // list notice trên app
