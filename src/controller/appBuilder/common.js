@@ -69,4 +69,17 @@ function getCommonImageJsonData(
   
 }
 
-module.exports = { getCommonDestJsonData, getCommonImageJsonData };
+const returnJsonDetailData = (val) =>{
+  return {
+    tmpl_code: val.T_SC_DT_TMPL_CODE,
+    tmpl_name: val.T_TMPL_LABEL,
+    tmpl_type: val.T_TMPL_TYPE,
+    tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
+    tmpl_smp_img: val.T_TMPL_IMG,
+    tmpl_user_type: val.T_SC_DT_USER_TYPE,
+    templateSEQ: val.SEQ,
+    isActive: val.IS_YN === "Y" ? true : false,
+  }
+}
+
+module.exports = { getCommonDestJsonData, getCommonImageJsonData, returnJsonDetailData };

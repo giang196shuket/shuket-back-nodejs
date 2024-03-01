@@ -27,7 +27,6 @@ module.exports = {
             type: type,
             shortContent: limitcontent(val.content),
             optionCheck: val.status === 'A' ? true : false
-
         })
     }
     const dataResponse = {

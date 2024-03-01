@@ -1,5 +1,5 @@
 const { messageSuccess } = require("../../helper/message");
-const { responseSuccess, responseDataList } = require("../../helper/response");
+const { responseSuccess, responseDataList, responseOrderProduct } = require("../../helper/response");
 const { requsetSearchListDate } = require("../../helper/request");
 const queriesHelper = require("../../helper/queries");
 const { getLimitQuery, customArrayImageProduct, customCategoryProduct } = require("../../helper/funtion");
@@ -112,30 +112,17 @@ module.exports = {
           }
         }
         //kết thúc tiến hành gán price mở rộng cho product
-        
        //push 
         list.push({
-            seq: row.SEQ,
-            moaCode: row.M_MOA_CODE,
-            posRegcode: row.M_POS_REGCODE,
-            code:row.P_CODE,
-            name:row.P_NAME,
             category: customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
-            unit: row.P_UNIT,
-            barcode: row.P_BARCODE,
-            status: row.P_STATUS,
-            list_price: row.P_LIST_PRICE,
-            provider: row.P_PROVIDER,
-            sale_price: row.P_SALE_PRICE,         
             price_type: priceType,
             price_updown: priceUpdown,
             price_number: priceNumber,
             price_show: Math.round(priceShow),
             price_number_show: priceNumber,
             price_updown_show: priceUpdown,
-            total_qty: row.TOTAL_QTY,
-            total_price: row.TOTAL_PRICE,
             images: customArrayImageProduct(row.P_IMG),
+            ...responseOrderProduct(row),
             rank:rank
         })
         rank++

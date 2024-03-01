@@ -1,7 +1,7 @@
 const pool = require("../../../config/database");
 const logger = require("../../../config/logger");
 const moment = require("moment");
-const { bargainQueryGetCol, bargainQuery } = require("./common");
+const productCommonModel = require("../../model/product/common");
 
 module.exports = class productRegistedModel {
   static async getProductRegister_Main_Pos(dbConnect, martId) {
@@ -131,20 +131,21 @@ module.exports = class productRegistedModel {
   static async selectProductsRegistered(
     checkUseStock,
     dataConnect,
-    status,
     {
-      option_check_stock,
-      stock_search_value,
-      keyword_type,
-      keyword_value,
+      keywordType,
+      keywordValue,
+      dateStart,
+      dateEnd,
+      status,
+      orderBy,
       category_code,
       category_sub_code,
-      date_start,
+      option_check_stock,
+      stock_search_value,
+      product_no_image,
+      product_only_brgn,
+      sort_prd_stock,
     },
-    date_end,
-    product_no_image,
-    product_only_brgn,
-    sort_prd_stock,
     offset,
     limit
   ) {
@@ -224,27 +225,27 @@ module.exports = class productRegistedModel {
           whereSearchUpDownSub = ` AND (TBSTOCK.STK_STOCK < ${stock_search_value} OR TBSTOCK.STK_STOCK IS NULL) `;
         }
       }
-      if (keyword_type && keyword_value) {
-        if (keyword_type === "prd_code") {
+      if (keywordType && keywordValue) {
+        if (keywordType === "prd_code") {
           //search product code
-          where += ` AND P_CODE = '${keyword_value}'  `;
-          whereSub += ` AND PM.P_CODE = '${keyword_value}'  `;
-        } else if (keyword_type === "prd_barcode") {
+          where += ` AND P_CODE = '${keywordValue}'  `;
+          whereSub += ` AND PM.P_CODE = '${keywordValue}'  `;
+        } else if (keywordType === "prd_barcode") {
           //search theo barcode
-          where += ` AND P_BARCODE = '${keyword_value}'  `;
-          whereSub += ` AND PM.P_BARCODE = '${keyword_value}'  `;
-        } else if (keyword_type === "prd_name") {
+          where += ` AND P_BARCODE = '${keywordValue}'  `;
+          whereSub += ` AND PM.P_BARCODE = '${keywordValue}'  `;
+        } else if (keywordType === "prd_name") {
           //search theo product name
-          where += ` AND P_NAME LIKE '%"${keyword_value}"%'  `;
-          whereSub += ` AND PM.P_NAME LIKE '%"${keyword_value}"%'  `;
-        } else if (keyword_type === "prd_tags") {
+          where += ` AND P_NAME LIKE '%"${keywordValue}"%'  `;
+          whereSub += ` AND PM.P_NAME LIKE '%"${keywordValue}"%'  `;
+        } else if (keywordType === "prd_tags") {
           //search theo product tags
-          where += ` AND P_TAGS LIKE '%"${keyword_value}"%'  `;
-          whereSub += ` AND PM.P_TAGS LIKE '%"${keyword_value}"%'  `;
-        } else if (keyword_type === "provider") {
+          where += ` AND P_TAGS LIKE '%"${keywordValue}"%'  `;
+          whereSub += ` AND PM.P_TAGS LIKE '%"${keywordValue}"%'  `;
+        } else if (keywordType === "provider") {
           //search theo nhà cung cấp
-          where += ` AND P_PROVIDER LIKE '%"${keyword_value}"%'  `;
-          whereSub += ` AND PM.P_PROVIDER LIKE '%"${keyword_value}"%'  `;
+          where += ` AND P_PROVIDER LIKE '%"${keywordValue}"%'  `;
+          whereSub += ` AND PM.P_PROVIDER LIKE '%"${keywordValue}"%'  `;
         }
       }
       if (dataConnect.M_MOA_CODE) {
@@ -260,7 +261,7 @@ module.exports = class productRegistedModel {
       }
       if (category_sub_code) {
         //search theo số category sub code
-        where += ` AND SEQ_P_CAT = '${category_sub_code}'  `;
+        where += ` AND SEQ_P_CAT_SUB = '${category_sub_code}'  `;
         whereSub += ` AND (SELECT MC.CTGRY_SEQNO FROM  ${dataConnect.M_DB_CONNECT}.MART_CTGRY AS MC WHERE MC.MART_SEQNO = MOG.MART_SEQNO 
         AND MC.CTGRY_SEQNO = MOG.CTGRY_SEQNO)  =  ${category_sub_code}  `;
       }
@@ -279,13 +280,13 @@ module.exports = class productRegistedModel {
         whereSub += ` AND PM.P_STATUS != 'D'  `;
       }
       // search product theo thời gian được tạo nằm giữa  date start và date end
-      if (date_start) {
-        where += ` AND DATE_FORMAT(C_TIME , '%Y-%m-%d') >=  DATE_FORMAT('${date_start}' , '%Y-%m-%d')  `;
-        whereSub += ` AND DATE_FORMAT(PM.C_TIME , '%Y-%m-%d') >=  DATE_FORMAT('${date_start}' , '%Y-%m-%d')  `;
+      if (dateStart) {
+        where += ` AND DATE_FORMAT(C_TIME , '%Y-%m-%d') >=  DATE_FORMAT('${dateStart}' , '%Y-%m-%d')  `;
+        whereSub += ` AND DATE_FORMAT(PM.C_TIME , '%Y-%m-%d') >=  DATE_FORMAT('${dateStart}' , '%Y-%m-%d')  `;
       }
-      if (date_end) {
-        where += ` AND DATE_FORMAT(C_TIME , '%Y-%m-%d') <=  DATE_FORMAT('${date_start}' , '%Y-%m-%d')  `;
-        whereSub += ` AND DATE_FORMAT(PM.C_TIME , '%Y-%m-%d') <=  DATE_FORMAT('${date_start}' , '%Y-%m-%d')  `;
+      if (dateEnd) {
+        where += ` AND DATE_FORMAT(C_TIME , '%Y-%m-%d') <=  DATE_FORMAT('${dateStart}' , '%Y-%m-%d')  `;
+        whereSub += ` AND DATE_FORMAT(PM.C_TIME , '%Y-%m-%d') <=  DATE_FORMAT('${dateStart}' , '%Y-%m-%d')  `;
       }
       if (product_no_image && product_no_image === "Y") {
         // search product nào có hình ảnh
@@ -297,7 +298,7 @@ module.exports = class productRegistedModel {
         where += ` AND (P_IMG IS  NULL AND P_IMG = '[]')   `;
         whereSub += ` AND (PM.P_IMG IS  NULL AND PM.P_IMG ='[]')    `;
       }
-      if (product_only_brgn && product_only_brgn === 1) {
+      if (product_only_brgn && product_only_brgn === 'Y') {
         //search product nào đang có khuyến mãi
         where +=
           " AND P_SALE_PRICE > 0 AND  (PRICE_CUSTOM_STATUS NOT IN ('A') OR PRICE_CUSTOM_STATUS IS NULL)  ";
@@ -393,8 +394,8 @@ module.exports = class productRegistedModel {
                   }.MART_ORDER_GOODS  WHERE USE_YN = 'Y' AND MART_SEQNO = MOG.MART_SEQNO 
                   AND GOODS_CODE = MOG.GOODS_CODE AND BRCD = MOG.BRCD order by MART_ORDER_GOODS_SEQNO desc limit 1) AS P_LIST_PRICE,
                   'POS SALE' AS SALE_SRC,
-                  (${bargainQuery(dataConnect.M_DB_CONNECT)}) AS BRGN_STR,
-                  (SELECT OB.BRGN_GROUP_NAME ${bargainQueryGetCol(
+                  (${productCommonModel.bargainQuery(dataConnect.M_DB_CONNECT)}) AS BRGN_STR,
+                  (SELECT OB.BRGN_GROUP_NAME ${productCommonModel.bargainQueryGetCol(
                     dataConnect.M_DB_CONNECT
                   )}) AS P_SALE_TITLE,
                   (SELECT CTGRY_LARGE_NO FROM ${
@@ -488,7 +489,7 @@ module.exports = class productRegistedModel {
                           PM.P_MIN_STOCK,
                           PM.P_MIN_STOCK_DEFAULT,
                           MOG.MART_ORDER_GOODS_SEQNO as PR_SEQ,
-                          (${bargainQuery(
+                          (${productCommonModel.bargainQuery(
                             dataConnect.M_DB_CONNECT
                           )}) AS BRGN_STR,
                           PP.PS_STATUS as PRICE_CUSTOM_STATUS,
@@ -554,13 +555,13 @@ module.exports = class productRegistedModel {
       return null;
     }
   }
-  static async viewDetailProduct(prd_seqs) {
+  static async viewDetailProduct(code) {
     let logBase = `models/productRegistedModel.viewDetailProduct:`;
     try {
       const sql = `  SELECT
         *
     FROM
-        TBL_MOA_PRD_MAIN WHERE SEQ = '${prd_seqs}' LIMIT 1`;
+        TBL_MOA_PRD_MAIN WHERE P_CODE = '${code}' LIMIT 1`;
 
       logger.writeLog("info", `${logBase} : ${sql}`);
 
@@ -572,7 +573,7 @@ module.exports = class productRegistedModel {
     }
   }
   static async searchProductImages(
-    keyword,
+    img_value,
     img_barcode,
     img_type,
     img_keyword,
@@ -584,12 +585,12 @@ module.exports = class productRegistedModel {
     try {
       let where = ` WHERE 1=1 `;
       // img_keyword: search by 'tags' | 'name'
-      if (keyword) {
+      if (img_value) {
         if (img_keyword === "tags") {
-          where += ` AND TB2.IM_TAGS LIKE '%${keyword}%'  `;
+          where += ` AND TB2.IM_TAGS LIKE '%${img_value}%'  `;
         }
         if (img_keyword === "name") {
-          where += ` AND TB2.IM_NAME LIKE '%${keyword}%'  `;
+          where += ` AND TB2.IM_NAME LIKE '%${img_value}%'  `;
         }
       }
       // img_barcode : 1 | 0  img use barcode
@@ -677,41 +678,4 @@ module.exports = class productRegistedModel {
     }
   }
 
-  static async getProductCategory(cateParent, dbConnect, posRegcode) {
-    let logBase = `models/productRegistedModel.getProductCategory:`;
-    try {
-      let sql = `  `;
-
-      if (cateParent) {
-        sql = `SELECT
-        MC.CTGRY_SEQNO AS code, MC.CTGRY_NAME AS name
-    FROM                
-         ${dbConnect}.MART_CTGRY AS MC
-    WHERE
-        MC.MART_SEQNO = '${posRegcode}'                 
-        AND MC.CTGRY_LARGE_NO = '${cateParent}'
-        AND MC.CTGRY_SMALL_NO > 0
-        AND CTGRY_STATE = 1  ORDER BY MC.CTGRY_ORDER, MC.CTGRY_NAME ASC`;
-      } else {
-        sql = `  SELECT
-        MC.CTGRY_LARGE_NO AS code, MC.CTGRY_NAME AS name                 
-    FROM
-        ${dbConnect}.MART_CTGRY AS MC
-    WHERE
-        MC.MART_SEQNO = '${posRegcode}'     
-        AND MC.CTGRY_LARGE_NO > 0
-        AND MC.CTGRY_STATE = 1
-        AND MC.CTGRY_SMALL_NO = 0 
-        AND MC.CTGRY_MEDIUM_NO = 0    ORDER BY MC.CTGRY_ORDER, MC.CTGRY_NAME ASC `;
-      }
-
-      logger.writeLog("info", `${logBase} : ${sql}`);
-
-      const [rows] = await pool.mysqlPool.query(sql);
-      return rows;
-    } catch (error) {
-      logger.writeLog("error", `${logBase} : ${error.stack}`);
-      return null;
-    }
-  }
 };

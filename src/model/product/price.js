@@ -1,7 +1,7 @@
 const pool = require("../../../config/database");
 const logger = require("../../../config/logger");
 const moment = require("moment");
-const { bargainQueryGetCol, bargainQuery } = require("./common");
+const productCommonModel = require("../../model/product/common");
 
 
 module.exports = class productPriceModel {

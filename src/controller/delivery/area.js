@@ -1,14 +1,14 @@
 const axios = require("axios");
 const { LINK_KAKAO_XY, LINK_KAKAO_DETAIL } = require("../../helper/link");
 const { messageError, messageSuccess } = require("../../helper/message");
-const { responseSuccess, responseErrorData, responseDataList } = require("../../helper/response");
+const { responseSuccess, responseErrorData, responseDataList, responseDeliveryAreaList } = require("../../helper/response");
 const { generateArray, getLimitQuery } = require("../../helper/funtion");
 const addressModel = require("../../model/delivery/area");
 const queriesHelper = require("../../helper/queries");
-const moment = require("moment")
+const moment = require("moment");
+const { mutationDataDeliveryArea, returnDataAddresDetailChild } = require("./common");
 
 async function getAddresDetailChild (addr){
-
   return await axios
           .get(
             `${LINK_KAKAO_DETAIL}?x=${addr.x}&y=${addr.y}&input_coord=WGS84`,
@@ -17,35 +17,15 @@ async function getAddresDetailChild (addr){
             }
           )
           .then((res) => {
+            
               return res.data.documents.map((ad) => ({
-              ADDRESS_X: addr.x,
-              ADDRESS_Y: addr.y,
-              PLACE_NAME: addr.place_name,
-              PLACE_URL: addr.place_url,
-              ADDRESS_NAME: ad.address.address_name,
-              ADDRESS_NAME2: ad.road_address.address_name,
-              BUILDING_NAME: ad.road_address.building_name,
-              MAIN_BUILDING_NO: ad.road_address.main_building_no,
-              PROVINCE: ad.road_address.region_1depth_name,
-              CITY: ad.road_address.region_2depth_name,
-              WARD: ad.road_address.region_3depth_name,
-              ROAD_NAME: ad.road_address.road_name,
-              SUB_BUILDING_NO: ad.road_address.sub_building_no,
-              ZONE_NO: ad.road_address.zone_no,
-              MAP_KAKAO_ID: addr.id,
-              id: addr.id, // cho FE xài cái checkbox
-
+                ...returnDataAddresDetailChild(addr, ad)
             }))
           })
           .catch((error) => {
             console.error("Error making API child request:", error.message);
           })
-      
-
 }
-
-
-
 async function fetchAddresDetailChild(listDataSub) {
   const promises = listDataSub.map((addr) => getAddresDetailChild(addr));
   const results = await axios.all(promises);
@@ -233,17 +213,10 @@ module.exports = {
       });
       list[i] = {
         id: i + 1,
-        seq: row.seq,
-        address_name: row.address_name,
-        road_address_name: row.road_address_name,
-        road_address_name: row.road_address_name,
-        region_1depth_name: row.region_1depth_name,
-        region_2depth_name: row.region_2depth_name,
-        zone_no: row.zone_no,
         delivery_fee:dataDeliveryReturn,
-        type: row.type,
         is_edit: 0,
-        is_process_edit: 0
+        is_process_edit: 0,
+        ...responseDeliveryAreaList(row)
       }
       i++
     }
@@ -315,20 +288,7 @@ module.exports = {
       const isExistData = await addressModel.checkAddressExist(itemData, req.userInfo.u_martid)
       if(isExistData == 0){
         insertDataAddress.push({
-          ADDRESS_NAME:  itemData.ADDRESS_NAME,
-          ADDRESS_NAME2:  itemData.ADDRESS_NAME2,
-          BUILDING_NAME:  itemData.BUILDING_NAME,
-          MAIN_BUILDING_NO:  itemData.MAIN_BUILDING_NO,
-          PROVINCE:  itemData.PROVINCE,
-          CITY:  itemData.CITY,
-          WARD:  itemData.WARD,
-          ROAD_NAME:  itemData.ROAD_NAME,
-          SUB_BUILDING_NO:  itemData.SUB_BUILDING_NO,
-          ZONE_NO:  itemData.ZONE_NO,
-          ADDRESS_X:  itemData.ADDRESS_X,
-          ADDRESS_Y:  itemData.ADDRESS_Y,
-          PLACE_URL:  itemData.PLACE_URL,
-          MAP_KAKAO_ID:  itemData.MAP_KAKAO_ID,
+          ...mutationDataDeliveryArea(itemData),
           SETTING_FEE: JSON.stringify(jsonData),
           STATUS: 'A',
           C_TIME: moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -344,20 +304,7 @@ module.exports = {
         const isExistData = await addressModel.checkAddressExist(itemData, req.userInfo.u_martid)
         if(isExistData == 0){
           insertDataAddress.push({
-            ADDRESS_NAME:  itemData.ADDRESS_NAME,
-            ADDRESS_NAME2:  itemData.ADDRESS_NAME2,
-            BUILDING_NAME:  itemData.BUILDING_NAME,
-            MAIN_BUILDING_NO:  itemData.MAIN_BUILDING_NO,
-            PROVINCE:  itemData.PROVINCE,
-            CITY:  itemData.CITY,
-            WARD:  itemData.WARD,
-            ROAD_NAME:  itemData.ROAD_NAME,
-            SUB_BUILDING_NO:  itemData.SUB_BUILDING_NO,
-            ZONE_NO:  itemData.ZONE_NO,
-            ADDRESS_X:  itemData.ADDRESS_X,
-            ADDRESS_Y:  itemData.ADDRESS_Y,
-            PLACE_URL:  itemData.PLACE_URL,
-            MAP_KAKAO_ID:  itemData.MAP_KAKAO_ID,
+            ...mutationDataDeliveryArea(itemData),
             SETTING_FEE: JSON.stringify(jsonData),
             STATUS: 'A',
             C_TIME: moment().format('YYYY-MM-DD HH:mm:ss'),

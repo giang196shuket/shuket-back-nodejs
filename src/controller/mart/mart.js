@@ -1,11 +1,11 @@
 const { messageError, messageSuccess } = require("../../helper/message");
-const { responseSuccess, responseErrorData, responseErrorInput, responseDataList } = require("../../helper/response");
+const { responseSuccess, responseErrorData, responseErrorInput, responseDataList, responseMartList, responseMartDetail } = require("../../helper/response");
 const martModel = require("../../model/mart/mart");
 const moment = require("moment");
 const { loadImageAws } = require("../../service/loadImage");
 const { s3 } = require("../../service/uploadS3");
 const  {getSize, getNameMartLogo}  = require("../../helper/upload");
-const { bucketImage, appBottomMenu } = require("../../helper/const");
+const { bucketImage, appBottomMenu, activitySummary } = require("../../helper/const");
 const fcmModel = require("../../model/fcm/fcm");
 const { requsetSearchList } = require("../../helper/request");
 const logger = require("../../../config/logger");
@@ -43,51 +43,17 @@ module.exports = {
       if (row.M_TYPE == "F") {
         martBusinessType = "FA";
       }
-
       list.push({
         id: i++,
-        mart_seq: row.MART_SEQ.toString(),
         mart_type: martBusinessType,
-        mart_code: row.M_MOA_CODE,
-        pos_regcode: row.M_POS_REGCODE,
-        mart_name: row.MART_NAME,
+        mart_seq: row.MART_SEQ.toString(),
         logo_url: row.M_LOGO ?  listLogo.find((lg)=>lg.code ===  row.M_MOA_CODE)?.logo : "",
-        city_name: {
-          en: row.CT_NAME_EN,
-          kr: row.CT_NAME_KR,
-        },
-        district_name: {
-          en: row.DT_NAME_EN,
-          kr: row.DT_NAME_KR,
-        },
-        register_date: moment(row.C_TIME).format("DD-MM-YYYY"),
-        subscr_cnt: parseInt(row.SUBSCR_CNT),
-        subscr_payment: parseInt(row.SUBSCR_PAYMENT),
-        collected: parseInt(row.COLLECTED),
-        due: parseInt(row.DUE),
-        discount: parseInt(row.DISCOUNT),
-        extra_payment: parseInt(row.EXTRA_PAYMENT),
-        status: row.STATUS,
-        partner_name: row.PARTNER_NAME,
         is_tdc: statusStock,
-        time_sync_tdc:
-          row.IS_STOCK == "Y" || row.IS_STOCK == "F"
-            ? moment(row.INITIAL_STOCK_DATE).format("YYYY-MM-DD hh:mm:ss")
-            : "NA",
-        time_last_sync_tdc:
-          row.IS_STOCK == "Y" && row.LAST_STOCK_DATE != ""
-            ? moment(row.LAST_STOCK_DATE).format("YYYY-MM-DD hh:mm:ss")
-            : "NA",
         text_color:
           (i + 1) % 2 == 0
             ? "background-color: #504f4f69;"
             : "background-color: #807e7e4f;",
-        tposcode: row.T_POS_CODE,
-        mart_type_name: {
-          en: row.C_ENG,
-          kr: row.C_KO,
-        },
-        is_order_sync: row.USE_TDC_ORDER,
+        ...responseMartList(row)
       });
     }
 
@@ -104,23 +70,7 @@ module.exports = {
     const logBase = `controller/mart/getDetailMart: `;
     const martSeq = req.query.mart_seq;
 
-    const activitySummary = {
-      app_users: {
-        total: "0/0",
-        active: "0/0",
-        inactive: "0/0",
-      },
-      push_mms: {
-        total: "0/0",
-        today: "0/0",
-        read_avg: "0% / NA",
-      },
-      billing: {
-        total: "0",
-        paid: "0",
-        due: "0.0",
-      },
-    };
+ 
     const arraySingle = ["SA", "SW", "SB"];
     const arrayAnotherApp = ["FA", "FW", "FB"];
     const row = await martModel.selectDetailMart(martSeq);
@@ -264,93 +214,24 @@ module.exports = {
     
     //end check pick up and TDC
     let martInfo = {
-      hq_code: row.M_HQ_CODE,
-      headFranchiseType: headFranchiseType,
-      mart_code: row.M_MOA_CODE,
-      mart_type: row.M_APP_TYPE,
+      store_set_hour_start: timePickUpStart, // Pickup hours start
+      store_set_hour_end: timePickUpEnd, // Pickup hours end
+      headFranchiseType: headFranchiseType, // head/ franchies mart
       show_franchise: showfranchise,
-      logo_name: row.M_LOGO,
-      logo_push_name: row.M_LOGO_PUSH,
-      logo_url: logoUrl.logo,
-      logo_push_url: logoPushUrl.logo,
-      mart_display_status: row.HIDE_SHUKET,
-      mart_name: row.M_NAME,
-      license: row.M_LICENSE,
-      phone: row.M_PHONE,
-      address: row.M_ADDRESS,
-      partner: {
-        code: row.SP_CODE,
-        name: row.SP_NAME,
-      },
-      sale_team: {
-        code: row.SPT_CODE,
-        name: row.SPT_NAME,
-      },
-      city: {
-        code: row.CT_CODE,
-        name: row.CT_NAME_KR,
-      },
-      district: {
-        code: row.DT_CODE,
-        name: row.DT_NAME_KR,
-      },
-      pos: {
-        code: row.M_POS_CODE,
-        name: row.POS_NAME,
-      },
-      pos_regcode: row.M_POS_REGCODE,
-      group_no: row.M_GROUP_NO,
-      pos_code: row.T_POS_CODE,
-      pos_connect: row.M_POS_CONNECT,
-      is_use_ymart: row.IS_YMART, // (Y/N)
-      pg_code: row.PG_CODE,
-      term_id: row.TERM_ID,
-      mpass: row.MPASS,
-      bizhour_open: bizhour_open,
-      bizhour_close: bizhour_close,
-      contact_name: row.M_CONTACT_NAME,
-      contact_phone: row.M_CONTACT_PHONE,
-      contact_email: row.M_CONTACT_EMAIL,
-      s_type: row.M_S_TYPE,      //subcription type
-      s_payment: row.M_S_PAYMENT, // billing method (CMS | CREADIT | CASH)
       s_date_service: sDateService, // Service start date
       s_date_billing: sDateBilling, // Billing start date
-      s_discount: row.M_S_DISCOUNT, // Discount(KRW)
-      s_discount_period: row.M_S_DISCOUNT_PERIOD, //Discount period (days)
-      receipt: row.M_RECEIPT, // use smart receipt (Y/N) (optional service)
-      local_partner: row.M_LOCAL_PARTNER, //use local partner (Y/N) (optional service)
-      mart_db: row.M_DB_CONNECT,
-      pop: row.M_POP, //use web pop (Y/N) (optional service)
-      mms: row.M_MMS,
-      mms_deposit: row.M_MMS_DEPOSIT,
-      status: row.M_STATUS,
-      is_tdc: row.IS_STOCK,
-      integrated_messging: row.INTEGRATED_MSG,
-      time_sync_tdc: row.IS_STOCK === "Y" ? row.INITIAL_STOCK_DATE : "NA",
-      hideInitial: row.IS_STOCK === "Y" && row.INITIAL_STOCK_DATE !== "" ? 1 : 0,
       op_payment: dataPaymentReturn, //list payment online + COD
       paymentOnline: paymentOnline, // use payment online 
       paymentCOD: paymentCOD, //use payment COD 
       mart_business_type: martBusinessType,
       old_type: headFranchiseType,
-      old_group_mart: row.M_HQ_CODE,
-      push_key_android: row.AN_CM_KEY, // key fcm
-      push_key_ios: row.IOS_CM_KEY, // key fcm
-      set_delivery: row.USE_DELIVERY,  // use delivery (y/n)
-      store_set_hour: row.USE_PICKUP, // use pickup time (y/n)
-      store_pickup_cod: row.USE_PICKUP_COD, // use pickup (y/n)
-      store_set_hour_start: timePickUpStart, // Pickup hours start
-      store_set_hour_end: timePickUpEnd, // Pickup hours end
-      store_pick_time_interval: parseInt(row.PICKUP_INTERVAL_TIME), // time pickup if use : 30, 60, 90, 120
-      order_sync: row.USE_TDC_ORDER,
       can_edit_sync_order: canEditSyncOrder,
-      is_custom_app: row.IS_CUSTOM_APP,
-      is_extend_brgn: row.USE_EXTEND_BRGN ? row.USE_EXTEND_BRGN : "N",
-      account_status: row.M_STATUS,
-      is_sync_image_by_group: row.IS_GROUP_SYNC_IMAGES,
-      value_sync_image_by_group: row.GROUP_SYNC_IMAGES_CODE ?  row.GROUP_SYNC_IMAGES_CODE : ''
+      logo_url: logoUrl.logo,
+      logo_push_url: logoPushUrl.logo,
+      bizhour_open: bizhour_open,
+      bizhour_close: bizhour_close,
+      ...responseMartDetail(row)
     };
-
     const configCustom = await martModel.getDataConfigCustomMart(
       row.M_MOA_CODE
     );
@@ -505,7 +386,7 @@ module.exports = {
 
     try {
        //update Mart Basic Info success
-    let result = await martModel.updateMartBasicInfo(_FILED, user.user_id)
+    let result = await martModel.updateMartBasicInfo(_FILED, group_mart_code, user.user_id)
       if(result){
         logger.writeLog("info", 'update Mart Basic Info success: ' + _FILED.mart_code);
       }
@@ -539,14 +420,14 @@ module.exports = {
       receive_begin_hours : _FILED.receive_begin_hours,
       receive_end_hours : _FILED.receive_end_hours
     }
-    if(configCustom.DATA_CONFIG){
+    if(configCustom?.DATA_CONFIG){
       // có thì update
       await queriesHelper.updateTableWhere('TBL_MOA_MART_CONFIG_CUSTOM', `DATA_CONFIG = '${JSON.stringify(dataConfig)}'`,
       ` M_MOA_CODE = '${_FILED.mart_code}' AND TYPE = 'RCT' AND STATUS = 'A' `
       )
     }else{
       // ko có thì insert
-      await queriesHelper.insertTableWhere('TBL_MOA_MART_CONFIG_CUSTOM', ' M_MOA_CODE, TYPE, DATA_CONFIG, STATUS, C_TIME, C_ID '
+      await queriesHelper.insertTableWhere('TBL_MOA_MART_CONFIG_CUSTOM', ' M_MOA_CODE, TYPE, DATA_CONFIG, STATUS, C_TIME, C_ID ',
       `'${_FILED.mart_code}', 'RCT', '${JSON.stringify(dataConfig)}', 'A', '${moment().format('YYYY-MM-DD HH:mm:ss')}', '${user.user_id}'`,
       )
     }

@@ -1,5 +1,5 @@
 const { messageSuccess } = require("../../helper/message");
-const { responseSuccess, responseDataList } = require("../../helper/response");
+const { responseSuccess, responseDataList, responseProductUnregisted } = require("../../helper/response");
 const queriesHelper = require("../../helper/queries");
 const productUnregistedModel = require("../../model/product/unregisted");
 const { requsetSearchList } = require("../../helper/request");
@@ -42,19 +42,11 @@ module.exports = {
          tags = generateTag([row.P_CODE, row.BARCODE, row.P_NAME, row.P_CAT, row.P_CAT_SUB, row.P_UNIT, row.P_PROVIDER])
        }
        list.push({
-         posRegcode : row.M_POS_REGCODE,
-         code:row.P_CODE,
-         name:row.P_NAME,
          images: arrImage ? arrImage :"",
          isGroupImage : isGroupImage,
          noImage : loadNoImage(),
-         category: row.P_CAT,
-         categorySub: row.P_CAT_SUB,
-         unit: row.P_UNIT,
-         barcode: row.BARCODE,
-         price:row.P_LIST_PRICE,
-         provider:row.P_PROVIDER,
-         tags: tags
+         tags: tags,
+         ...responseProductUnregisted(row)
        })
     }
 

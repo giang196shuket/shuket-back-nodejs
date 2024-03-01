@@ -1,5 +1,5 @@
 const { messageSuccess } = require("../../helper/message");
-const { responseSuccess, responseDataList } = require("../../helper/response");
+const { responseSuccess, responseDataList, responseOrderList } = require("../../helper/response");
 const { requsetSearchListDate } = require("../../helper/request");
 const queriesHelper = require("../../helper/queries");
 const { MART_HIDE_CHANGE_STATUS_ORDER, DELIVERY_PUSH_TYPE, MART_USE_DELIVERY_PUSH, textDeFault, days, MART_USE_DELIVERY_FEE, DELIVERY_FEE } = require("../../helper/const");
@@ -9,8 +9,7 @@ const moment = require("moment");
 module.exports = {
   
 
-  async getOrderList(req, res, next) {
-         
+  async getOrderList(req, res, next) {      
     let params = requsetSearchListDate(req.body, [
         "methodPayment", // mã của các phương thức thanh toán : SKP, BANK, CARD, KKP,...
         "orderStatus", // số mã của các trạng thái order trong table TBL_MOA_CODE_COMMON,
@@ -90,7 +89,6 @@ module.exports = {
         }else if(val.O_STATUS === 64){
             statusColorBox = '#b4b800'
         }
-
         // lấy địa chỉ giao hàng
         let address = ''
         if(val.U_ADDR_RA){
@@ -326,7 +324,6 @@ module.exports = {
             arrAddress.splice(4, 1);
             addressGroup = arrAddress.join(' ').replace(/\(/g, '\n(') + '  ';
          }
-
        }
        let cartName = ""
        if(val.NICE_CARDNAME){
@@ -342,52 +339,8 @@ module.exports = {
        const productList = await orderModel.getOrderDetailData(val.O_CODE, req.userInfo.u_martid, req.dataConnect)
 
        jsonResponseData.push({
-         orderCode: val.O_CODE,
-         orderCustomer: usernameOrder,
-         orderCustomerPhone: val.U_ADDR_PHONE,
-         orderGoodName: val.OD_GOODS_NAME,
-         orderGoodCNT: val.OD_GOODS_CNT,
-         orderDate: moment(val.C_TIME).format('YYYY-MM-DD HH:mm:ss'),
-         orderTotalPrice: val.ORDERS_SALE_PRICE,
-         orderShipping: val.OSHIP,
-         orderCoupon: val.O_COUPON,
-         orderPoint: val.O_POINT,
-         orderPayPrice: val.O_PAY_AMOUNT,
-         orderCartName: val.PAY_METHOD_CARD_KO,
-         orderNicePayCartName: cartName,
-         orderPayMethod: val.PAY_METHOD,
-         orderPayType: val.O_PAY_TYPE,
-         orderAddress: address,
-         orderStatusText: val.ORDERS_GRP,
-         orderStatusCode: val.O_STATUS,
-         orderCancelComment: val.OD_CANCEL_CMNT, // lý do hủy
-         orderRFLEX: val.OD_RFEX_CMNT,
-         isPrint: val.IS_PRINT,
-         orderBillOld: val.O_PAY_AMOUNT_HIS ? val.O_PAY_AMOUNT_HIS : 0,
-         isWeburlOrder: val.O_WEBURL,
-         isUsePushDelivery: isUsePushDelivery,
-         pushSetTime: pushSetTime,
-         pushCustomSetTime: pushCustomSetTime,
-         pushCreateTime: val.OB_TIME_CREATE,
-         pushShowTimeDisplay: pushShowTimeDisplay,
-         orderType: val.O_DELIVERY_TYPE,
-         timePickupOrder: timePickupOrder,
-         dataSubCancel: dataSubCancel,
-         isSubCancel: isSubCancel,
-         isDelivery: val.IS_DELIVERY,
-         deliveryText1: deliveryText1,
-         deliveryText2:deliveryText2,
-         deliveryText3:deliveryText3,
-         groupAddress: val.GROUP_ADDRESS,
-         orderPostCode: val.U_POST_CODE,
-         isCheck: val.IS_CHECK,
-         bundleOrder: val.BUNDLE_ORDER,
-         deliveryType: val.DELIVERY_TYPE,
-         deliveryDate: val.DELIVERY_DATE ? moment(val.DELIVERY_DATE).format('YYYY-MM-DD') : "",
-         orderAddressDistrict: val.U_ADDR_CITY,
-         orderAddressCity: val.U_ADDR_STATE,
-         statusColorBox: statusColorBox,
-         statusColorText:statusColorText,
+         ...responseOrderList(val, usernameOrder, cartName, address, isUsePushDelivery, pushSetTime, pushCustomSetTime, pushShowTimeDisplay,
+        timePickupOrder, dataSubCancel, isSubCancel, deliveryText1, deliveryText2, deliveryText3, statusColorBox, statusColorText ),
          productList: assignSequentialNumbers(productList)
        })
     }
@@ -406,7 +359,6 @@ module.exports = {
                 jsonDataGroup[item.orderPostCode].dataOrderGroup = jsonDataGroup[item.orderPostCode].dataOrderGroup.concat(item)
                 jsonDataGroup[item.orderPostCode].total = jsonDataGroup[item.orderPostCode].dataOrderGroup.length
                 jsonDataGroup[item.orderPostCode].nameAddress = item.groupAddress ? item.groupAddress : 'No address'
-
             });
         } 
 
@@ -478,8 +430,6 @@ module.exports = {
         isFreeDelivery: martData.IS_FREE_DELIVERY,
         freeDeliveryAmount: martData.FREE_DELIVERY_AMOUNT,  
     }
-
-
     return res
       .status(200)
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));

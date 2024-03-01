@@ -2,12 +2,8 @@ const { bannerDefault, bucketImage, textDeFault, martBGColorDefault } = require(
 const { getLimitQuery } = require("../../helper/funtion");
 const { messageSuccess } = require("../../helper/message");
 const queriesHelper = require("../../helper/queries");
-const { responseSuccess } = require("../../helper/response");
-const appConfigModel = require("../../model/appConfig/appConfig");
+const { responseSuccess, reponseAppInfo } = require("../../helper/response");
 const appInfoModel = require("../../model/appInfo/appInfo");
-const catalogModel = require("../../model/catalog/catalog");
-const mainModel = require("../../model/main/main");
-const martModel = require("../../model/mart/mart");
 const { loadImageAws } = require("../../service/loadImage");
 
 
@@ -110,56 +106,16 @@ module.exports = {
     }
    
     const martInfo = {
-        moaCode : row.M_MOA_CODE,
         bizhourOpen : bizhourArr[0],
         bizhourClose : bizhourArr[1],
         bannerAppUrl : row.M_BANNER_APP ? await loadImageAws(row.M_BANNER_APP , bucketImage.bannerapp) : await loadImageAws(bannerDefault , bucketImage.bannerapp),
         logoAppUrl : row.M_LOGO_APP ? await loadImageAws(row.M_LOGO_APP , bucketImage.logoapp) : await loadImageAws(row.M_LOGO , bucketImage.logoapp),
-        phone: row.M_PHONE,
-        martIntroApp : row.M_INTRO_APP ? row.M_INTRO_APP : row.M_NAME + textDeFault.intro1 + row.M_NAME + textDeFault.intro2,
         notice: noticeList, // list notice trên app
-        isUploadLogo: 0,
-        isUploadBanner : 0,
-        isShowSlideNoti: isShowSlideNoti, // ẩn hay hiện slide notice
-        martBGClorApp : row.M_COLOR_APP ? row.M_COLOR_APP : martBGColorDefault,
-        timeSlideNoti: row.M_TIME_SET_SLIDE_APP ? row.M_TIME_SET_SLIDE_APP : 3, // thời gian chuyển slide 
-        cTime: row.C_TIME ? row.C_TIME : '',
-        mTime: row.M_TIME ? row.M_TIME :"",
-        cName: row.C_NAME ? row.C_NAME : "",
-        mName: row.M_NAME ? row.M_NAME : "",
-        address: row.M_ADDRESS,
-        city:{
-            code: row.CT_CODE,
-            name: row.CT_NAME_KR
-        },
-        district : {
-            code: row.DT_CODE,
-            name: row.DT_NAME_KR
-        },
-        setDelivery: row.USE_DELIVERY,
-        pickupSetHour: row.USE_PICKUP,
-        pickupCod : row.USE_PICKUP_COD,
-        pickupStartHour: timePickUpStart,
-        pickupEndHour: timePickUpEnd,
-        setIntro: row.USE_INTRO,
-        cateScreenCode: cateScreenCode,
-        reviewPush: reviewPush,
-        reviewPushHour: reviewPushHour,
-        reviewPushDays: reviewPushDays,
-        reviewPushTime: reviewPushTime,
-        reviewPushContent: reviewPushContent,
-        cartPush: cartPush,
-        cartPushHour: cartPushHour,
-        cartPushDays: cartPushDays,
-        cartPushTime: cartPushTime,
-        cartPushContent: cartPushContent,
-        showMartCompanyInfo: showMartCompanyInfo,
-        martName: martName,
-        license: license,
-        contactName: contactName,
-        csLine1 :cs_line1,
-        csLine2: cs_line2
+        ...reponseAppInfo(row, isShowSlideNoti, timePickUpStart, timePickUpEnd, cateScreenCode, reviewPush, reviewPushHour, reviewPushDays,
+        reviewPushTime, reviewPushContent, cartPush, cartPushHour, cartPushDays, cartPushTime, cartPushContent, showMartCompanyInfo, martName,
+        license, contactName, cs_line1, cs_line2)
     }
+    
     return res
     .status(200)
     .json(responseSuccess(200, messageSuccess.Success, martInfo));

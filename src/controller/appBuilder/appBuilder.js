@@ -1,10 +1,8 @@
 const logger = require("../../../config/logger");
-const { generate_token } = require("../../service/auth");
 const { messageError, messageSuccess } = require("../../helper/message");
 const { responseSuccess, responseErrorData } = require("../../helper/response");
 const moment = require("moment");
 const queriesHelper = require("../../helper/queries");
-const { loadImageAws } = require("../../service/loadImage");
 const { composeTypeOneTemplateData } = require("./teamplate/one");
 const { composeTypeEightTemplateData } = require("./teamplate/eight");
 const { composeTypeTenTemplateData } = require("./teamplate/ten");
@@ -14,6 +12,7 @@ const appBuilderModel = require("../../model/appBuilder/appBuilder");
 const templateViewModel = require("../../model/appBuilder/common");
 const { listTemplateCode } = require("../../helper/const");
 const { composeTypeSevenTemplateData } = require("./teamplate/seven");
+const { returnJsonDetailData } = require("./common");
 
 async function getTemplateNotUse(martId, sreenCode) {
   // appBuilderModel
@@ -373,19 +372,12 @@ module.exports = {
           scCode
         );
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: titleBanner,
           data_app: dataApp,
           title: title,
           showTitle: showTitle,
           styleTitle: styleData,
-          isActive: val.IS_YN === "Y" ? true : false,
-          templateSEQ: val.SEQ,
         });
       }else  if (val.T_SC_DT_TMPL_CODE == "AP00000002") {
         //event and blog
@@ -400,21 +392,13 @@ module.exports = {
          //get detail data of 2 TEMPLATE
         const dataApp = await composeTypeTwoTemplateData(JSON.parse(val.T_SC_DT_TMPL_DATA), user.u_martid)
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: '',
           tmpl_template_type: JSON.parse(val.T_SC_DT_TMPL_DATA).tmpl_type, // dùng cho FE phân biệt blog và event
           data_app: dataApp,
           Title: title,
           showTitle: showTitle,
-          isActive: val.IS_YN === 'Y' ? true : false,
           styleTitle: style,
-          templateSEQ: val.SEQ,
-
         })
 
       } else if(val.T_SC_DT_TMPL_CODE == "AP00000007"){
@@ -436,20 +420,12 @@ module.exports = {
           req.dataConnect.M_DB_CONNECT
         );
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: "",
-          isActive: val.IS_YN === "Y" ? true : false,
           data_app: dataApp,
-          templateSEQ: val.SEQ,
           title:title,
           showTitle : showTitle,
           styleTitle: dataStyle
-
         });
       }  else if (val.T_SC_DT_TMPL_CODE == "AP00000008") {
         //product list for cart
@@ -466,17 +442,9 @@ module.exports = {
         );
 
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: titleTemplate,
-          isActive: val.IS_YN === "Y" ? true : false,
           data_app: dataApp,
-          templateSEQ: val.SEQ,
-
         });
       } else if (val.T_SC_DT_TMPL_CODE == "AP00000010") {
         //category slider icon
@@ -496,19 +464,12 @@ module.exports = {
         );
 
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: "",
           data_app: dataApp,
           title: title,
           showTitle: showTitle,
           styleTitle: styleData,
-          isActive: val.IS_YN === "Y" ? true : false,
-          templateSEQ: val.SEQ,
         });
       } else if (val.T_SC_DT_TMPL_CODE == "AP00000013") {
         // search
@@ -518,15 +479,9 @@ module.exports = {
           user.u_martid
         );
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: "",
           data_app: dataApp,
-          templateSEQ: val.SEQ,
 
         });
       }else if (val.T_SC_DT_TMPL_CODE == "AP00000014") {
@@ -537,15 +492,9 @@ module.exports = {
           user.u_martid
         );
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: "",
           data_app: dataApp,
-          templateSEQ: val.SEQ,
 
         });
       }else if (val.T_SC_DT_TMPL_CODE == "AP00000015") {
@@ -556,16 +505,9 @@ module.exports = {
           user.u_martid
         );
         jsonDetailData.push({
-          tmpl_code: val.T_SC_DT_TMPL_CODE,
-          tmpl_name: val.T_TMPL_LABEL,
-          tmpl_type: val.T_TMPL_TYPE,
-          tmpl_order: parseInt(val.T_SC_DT_TMPL_ORDER),
-          tmpl_smp_img: val.T_TMPL_IMG,
-          tmpl_user_type: val.T_SC_DT_USER_TYPE,
+          ...returnJsonDetailData(val),      
           tmpl_template_title: "",
           data_app: dataApp,
-          templateSEQ: val.SEQ,
-
         });
       }
     }

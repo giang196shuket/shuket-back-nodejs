@@ -2,7 +2,7 @@ const { getLimitQuery, limitcontent } = require("../../helper/funtion");
 const { LINK_BACKEND_DEV } = require("../../helper/link");
 const { messageSuccess } = require("../../helper/message");
 const queriesHelper = require("../../helper/queries");
-const { responseSuccess, responseDataList } = require("../../helper/response");
+const { responseSuccess, responseDataList, responseNoticeAppList } = require("../../helper/response");
 const appNotice = require("../../model/notice/appNotice");
 const { loadImageAws } = require("../../service/loadImage");
 const moment = require("moment");
@@ -72,30 +72,18 @@ module.exports = {
         martTargetName = val.MART_TYPE;
         showPopupMart = 0;
       }
-      jsonResponseData.push({
-        seq: val.SEQ,
-        code: val.NT_MSG_CODE,
-        mMoaCode: val.M_MOA_CODE,
-        title: val.NT_MSG_TITLE,
-        image: LINK_BACKEND_DEV + val.NT_MSG_IMAGES,
-        content: val.NT_MSG_DETAIL,
-        sdate: val.NT_MSG_SDATE,
-        edate: val.NT_MSG_EDATE,
-        martSisplay: val.NT_MSG_DISPLAY,
+      jsonResponseData.push({     
         startSate: startDate,
         startHour: startHour,
         start_Minus: startMinute,
         endDate: endDate,
         endHour: endHour,
         endMinus: endMinute,
-        noticeStatus: val.NT_MSG_STATUS,
-        targetScreenOption: val.NT_SCREEN_TARGET_OPTION,
         targetScreenUrl: linkTarget,
         linkType: linkType,
-        cTime: val.C_TIME,
-        mTime: val.M_TIME,
         targetMart: martTargetName,
         showPopupMart: showPopupMart,
+        ...responseNoticeAppList(val)
       });
     }
     responseDataList;

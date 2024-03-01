@@ -1,7 +1,7 @@
 const pool = require("../../../config/database");
 const logger = require("../../../config/logger");
 const moment = require("moment");
-const { bargainQueryGetCol, bargainQuery } = require("./common");
+const productCommonModel = require("../../model/product/common");
 
 module.exports = class productInventoryModel {
   static async selectProductInventory(
@@ -222,8 +222,8 @@ module.exports = class productInventoryModel {
             PM.M_TIME AS M_TIME,
             MOG.EXPSR_PRICE AS P_LIST_PRICE,
             'POS SALE' AS SALE_SRC,
-            (${bargainQuery(dataConnect.M_DB_CONNECT)}) AS BRGN_STR,
-            (SELECT OB.BRGN_GROUP_NAME  ${bargainQueryGetCol(dataConnect.M_DB_CONNECT)}) AS P_SALE_TITLE,
+            (${productCommonModel.bargainQuery(dataConnect.M_DB_CONNECT)}) AS BRGN_STR,
+            (SELECT OB.BRGN_GROUP_NAME  ${productCommonModel.bargainQueryGetCol(dataConnect.M_DB_CONNECT)}) AS P_SALE_TITLE,
             (SELECT CTGRY_LARGE_NO FROM ${dataConnect.M_DB_CONNECT}.MART_CTGRY 
                 WHERE CTGRY_SEQNO = MOG.CTGRY_SEQNO AND MART_SEQNO = MOG.MART_SEQNO LIMIT 1) AS CTGRY_LARGE_NO,
             (SELECT CTGRY_MEDIUM_NO FROM ${dataConnect.M_DB_CONNECT}.MART_CTGRY 

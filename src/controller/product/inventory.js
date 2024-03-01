@@ -3,7 +3,7 @@ const { arrayColumn, arrayColumnAssign, customArrayImageProduct, customCategoryP
 const { messageSuccess } = require("../../helper/message");
 const queriesHelper = require("../../helper/queries");
 const { requsetSearchListDate } = require("../../helper/request");
-const { responseDataList, responseSuccess } = require("../../helper/response");
+const { responseDataList, responseSuccess, responseProductInventory } = require("../../helper/response");
 const productInventoryModel = require("../../model/product/inventory");
 const { loadImageAwsProduct, loadNoImage } = require("../../service/loadImage");
 const moment = require("moment");
@@ -12,7 +12,6 @@ module.exports = {
         const logBase = "controlller/product/register.searchProductRegisteredList";
         const user = req.userInfo;
         let checkUseStock = null;
-       
         let defaultStock = 5; // sẽ cảnh báo khi số lượng product bé hơn hoặc bằng 5
         checkUseStock = await queriesHelper.getRowDataWhere(
           "TBL_MOA_MART_CONFIG",
@@ -58,8 +57,6 @@ module.exports = {
         //stockSearchValue : if optionCheckStock = D => find stock < stockSearchValue
         //categoryCode : code category product
         //categorySubCode : sub code category product
-        
-    
         page = !params.page ? 1 : params.page;
         limit = !params.limit ? 1 : params.limit;
         const offset = params.page * params.limit - params.limit;
@@ -105,7 +102,6 @@ module.exports = {
             );
           }
         }
-    
         let list = [];
         let i = 0;
         let showSettingMaxMin = "N";
@@ -200,43 +196,15 @@ module.exports = {
             }
           }
           //kết thúc tiến hành gán price mở rộng cho product
-    
-
-          list[i] = {
-            seq: row.SEQ,
-            moa_code: row.M_MOA_CODE,
-            pos_regcode: row.M_POS_REGCODE,
-            code: row.P_CODE,
-            name: row.P_NAME,
+              list[i] = {          
             category:  customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
-            unit: row.P_UNIT,
-            barcode: row.P_BARCODE,
-            status: row.P_STATUS,
-            list_price: row.P_LIST_PRICE,
-            provider: row.P_PROVIDER,
-            sale_price: row.P_SALE_PRICE,
-            sale_percent: Math.round((row.P_SALE_PRICE / row.P_LIST_PRICE) * 10),
-            sale_title: row.P_SALE_TITLE,
-            sale_src: row.SALE_SRC,
-            min_stock: !row.P_MIN_STOCK ? 0 : row.P_MIN_STOCK,
             is_pro_stock: isProStock,
             price_type: priceType,
             price_updown: priceUpdown,
             price_number: priceNumber,
-            price_show: Math.round(priceShow),
-            is_show_price: row.PRICE_CUSTOM_STATUS,
-            use_time: row.USE_TIME,
+            price_show: Math.round(priceShow),        
             images: customArrayImageProduct(row.P_IMG),
-            time_start: row.TIME_START
-              ? moment(row.TIME_START).format("YYYY-MM-DD")
-              : null,
-            time_end: row.TIME_END
-              ? moment(row.TIME_END).format("YYYY-MM-DD")
-              : null,
-            create_name: row.C_NAME,
-            create_time: row.C_TIME,
-            update_name: row.M_NAME,
-            update_time: row.M_TIME,
+            ...responseProductInventory(row)         
           };
           
           // bắt đầu gán giá trị stock cho product

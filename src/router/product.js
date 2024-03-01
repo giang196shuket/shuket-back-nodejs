@@ -3,6 +3,7 @@ const  controllerRegisted  = require("../controller/product/registed");
 const  controllerUnregisted  = require("../controller/product/unregisted");
 const  controllerInventory = require("../controller/product/inventory");
 const  controllerPrice = require("../controller/product/price");
+const  controller = require("../controller/product/common");
 
 const  middleware  = require("../middleware/auth");
 
@@ -25,7 +26,8 @@ router.post("/search_product_inventory_list",  middleware.verifyToken, controlle
 //price
 router.post("/search_product_price_list",  middleware.verifyToken, controllerPrice.searchProductPriceList);
 
-//get category product dùng cho cả registed page và unregisted page
-router.get("/get_product_categories",  middleware.verifyToken, controllerRegisted.getProductCategory);
+//COMMON
+router.post("/update_status",  middleware.verifyToken, controller.updateStatus);
+router.post("/get_product_categories",  middleware.verifyToken, controller.getProductCategory);
 
 module.exports = router;

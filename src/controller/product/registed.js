@@ -5,6 +5,8 @@ const {
   responseSuccess,
   responseErrorData,
   responseDataList,
+  responseProductRegisted,
+  responseProductDetai,
 } = require("../../helper/response");
 const moment = require("moment");
 const productRegistedModel = require("../../model/product/registed");
@@ -190,7 +192,6 @@ module.exports = {
     const dataListProduct = await productRegistedModel.selectProductsRegistered(
       checkUseStock,
       req.dataConnect,
-      params.status,
       params,
       offset,
       params.limit
@@ -332,48 +333,14 @@ module.exports = {
         showSettingMaxMin = "Y";
       }
       list[i] = {
-        seq: row.SEQ,
-        moa_code: row.M_MOA_CODE,
-        pos_regcode: row.M_POS_REGCODE,
-        code: row.P_CODE,
-        name: row.P_NAME,
         category: customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
-        unit: row.P_UNIT,
-        barcode: row.P_BARCODE,
-        status: row.P_STATUS,
-        list_price: row.P_LIST_PRICE,
-        provider: row.P_PROVIDER,
-        sale_price: row.P_SALE_PRICE,
-        sale_percent: Math.round((row.P_SALE_PRICE / row.P_LIST_PRICE) * 10),
-        sale_title: row.P_SALE_TITLE,
-        sale_src: row.SALE_SRC,
-        min_stock: !row.P_MIN_STOCK ? 0 : row.P_MIN_STOCK,
         is_pro_stock: isProStock,
         price_type: priceType,
         price_updown: priceUpdown,
         price_number: priceNumber,
         price_show: Math.round(priceShow),
-        is_show_price: row.PRICE_CUSTOM_STATUS,
-        is_pro_maxqty: row.P_USE_MAXQTY_PD,
-        pro_max_qty: !row.P_VALUE_MAXQTY_PD ? 0 : row.P_VALUE_MAXQTY_PD,
-        pro_max_qty_default: !row.P_VALUE_MAXQTY_PD ? 0 : row.P_VALUE_MAXQTY_PD,
-        is_pro_minqty: row.P_USE_MINQTY_PD,
-        pro_min_qty: !row.P_VALUE_MINQTY_PD ? 0 : row.P_VALUE_MINQTY_PD,
-        pro_min_qty_default: !row.P_VALUE_MINQTY_PD ? 0 : row.P_VALUE_MINQTY_PD,
         pro_show_settings_max_min: proSettingsMaxMin,
-        use_time: row.USE_TIME,
-        images: customArrayImageProduct(row.P_IMG),
-        time_start: row.TIME_START
-          ? moment(row.TIME_START).format("YYYY-MM-DD")
-          : null,
-        time_end: row.TIME_END
-          ? moment(row.TIME_END).format("YYYY-MM-DD")
-          : null,
-        tags: row.P_TAGS,
-        create_name: row.C_NAME,
-        create_time: row.C_TIME,
-        update_name: row.M_NAME,
-        update_time: row.M_TIME,
+        ...responseProductRegisted(row)
       };
 
       // bắt đầu gán giá trị stock cho product
@@ -508,6 +475,7 @@ module.exports = {
         responseSuccess(200, messageSuccess.Success, messageSuccess.Success)
       );
   },
+
   async getProductCategory(req, res, next) {
     const {cateParent} = req.query 
     const data = await productRegistedModel.getProductCategory(cateParent, req.dataConnect.M_DB_CONNECT, req.dataConnect.M_POS_REGCODE);
@@ -556,9 +524,10 @@ module.exports = {
   },
 
   async viewDetailProduct(req, res, next) {
-    const { prd_seq } = req.query;
+    const { code } = req.query;
     // get detail product
-    const product = await productRegistedModel.viewDetailProduct(prd_seq);
+    const product = await productRegistedModel.viewDetailProduct(code);
+
     // Get cate for search by images
     const arrCate = await productRegistedModel.getArryCateOfImage(
       req.dataConnect.M_DB_CONNECT,
@@ -580,15 +549,16 @@ module.exports = {
         });
       }
     }
-    const productImage = JSON.parse(product.P_IMG);
     let arrImg = [];
+    const productImage = JSON.parse(product?.P_IMG);
     productImage.forEach((ele, index) => {
       arrImg.push({
         thumb: loadImageAwsProduct(ele)?.thumb,
-        main: ele.main,
-        priority: ele.priority,
+        main: parseInt(ele.main),
+        priority: parseInt(ele.priority),
         cur_items: ele,
         cur_image: ele.items[0].value,
+        id:index
       });
     });
     if (arrImg.length === 0) {
@@ -597,22 +567,10 @@ module.exports = {
         thumb: loadNoImage(),
       });
     }
-    console.log(product);
     let dataResponse = {
       row_detail: {
-        seq: product.SEQ,
-        moa_code: product.M_MOA_CODE,
-        pos_regcode: product.M_POS_REGCODE,
-        code: product.P_CODE,
-        name: product.P_NAME,
+        ...responseProductDetai(product),
         category: product.P_CATE ? product.P_CATE : arrCate[0].P_CAT,
-        unit: product.P_UNIT,
-        barcode: product.P_BARCODE,
-        list_price: product.P_LIST_PRICE,
-        provider: product.P_PROVIDER,
-        sale_price: product.P_SALE_PRICE,
-        sale_title: product.P_SALE_TITLE,
-        tags: product.P_TAGS,
         cate_list: dataCate,
         images: arrImg,
       },
@@ -622,7 +580,7 @@ module.exports = {
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
   async searchProductImages(req, res, next) {
-    const { img_barcode, img_cate, img_keyword, img_type, keyword } = req.body;
+    const { img_barcode, img_cate, img_keyword, img_type, img_value } = req.body;
     // img_barcode : 1 | 0  img use barcode
     // img_cate : number cate code of image
     // img_type: all | main image | sub image
@@ -631,7 +589,7 @@ module.exports = {
     const user = req.userInfo;
     // Get images of mart
     const dataImages = await productRegistedModel.searchProductImages(
-      keyword,
+      img_value,
       img_barcode,
       img_type,
       img_keyword,

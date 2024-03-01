@@ -2,7 +2,7 @@ const { getLimitQuery } = require("../../helper/funtion");
 const { messageSuccess } = require("../../helper/message");
 const queriesHelper = require("../../helper/queries");
 const { getDataFieldFrom } = require("../../helper/queries");
-const { responseSuccess, responseDataList } = require("../../helper/response");
+const { responseSuccess, responseDataList, responseImageBannerCouponList } = require("../../helper/response");
 const { generateBannerCodeForMart, removeTypeFileOfName, getSize } = require("../../helper/upload");
 const imagesBannerCouponModel = require("../../model/images/bannerCoupon");
 const { s3 } = require("../../service/uploadS3");
@@ -55,24 +55,9 @@ module.exports = {
             typeImageEN = "Coupon"
         }
         jsonResponseData.push({
-            code:  val.SEQ,
-            name: val.CI_NAME,
             typeImage : typeImage,
             typeImageEN : typeImageEN,
-            category: val.C_KO,
-            categoryEn: val.C_ENG,
-            image: val.CI_URI,
-            file: val.CI_FILE,
-            status: val.CI_STATUS,
-            cTime: val.C_TIME,
-            cId:val.C_ID,
-            mTime: val.M_TIME,
-            mId: val.M_ID,
-            type: val.CI_TYPE,
-            typeCate: val.CI_THEME,
-            typeOld: val.CI_TYPE,
-            typeCateOld: val.CI_THEME,
-            nameOld: val.CI_NAME
+           ...responseImageBannerCouponList(val)
         })
     }
     const responseData = {

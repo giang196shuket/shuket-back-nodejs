@@ -95,8 +95,25 @@ const appBottomMenu =[
     T_TB_STATUS: 'A'
   },
 ]
-
+const activitySummary = {
+  app_users: {
+    total: "0/0",
+    active: "0/0",
+    inactive: "0/0",
+  },
+  push_mms: {
+    total: "0/0",
+    today: "0/0",
+    read_avg: "0% / NA",
+  },
+  billing: {
+    total: "0",
+    paid: "0",
+    due: "0.0",
+  },
+};
 module.exports = {
+  activitySummary,
   appBottomMenu,
   arrayTypeSingle,
   arrayTypeAnotherApp,

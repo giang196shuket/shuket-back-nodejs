@@ -271,9 +271,9 @@ module.exports = class martModel {
       }
    }
   //update mart basic info
-static async updateMartBasicInfo({group_mart_code, mart_business_type, partner, sale_team, mart_name, logo_name, logo_push_name, 
+static async updateMartBasicInfo({mart_business_type, partner, sale_team, mart_name, logo_name, logo_push_name, 
 license, city, district, address, phone, contact_name, contact_phone, contact_email, bizhour_open, bizhour_close, 
-account_status, mart_code }, userId){
+account_status, mart_code }, group_mart_code, userId){
     let logBase = `models/martModel.updateMartBasicInfo: `;
     try {
     let  sql = ` UPDATE TBL_MOA_MART_BASIC  

@@ -3,21 +3,17 @@ const { arrayColumn, arrayColumnAssign, customArrayImageProduct, customCategoryP
 const { messageSuccess } = require("../../helper/message");
 const queriesHelper = require("../../helper/queries");
 const { requsetSearchListDate } = require("../../helper/request");
-const { responseDataList, responseSuccess } = require("../../helper/response");
+const { responseDataList, responseSuccess, responseProductPrice } = require("../../helper/response");
 const productPriceModel = require("../../model/product/price");
 const { loadImageAwsProduct, loadNoImage } = require("../../service/loadImage");
 const moment = require("moment");
 module.exports = {
     async searchProductPriceList(req, res, next) {
         const user = req.userInfo;
-       
-       
         let params = requsetSearchListDate(req.body, [
           "customPriceStatus",
         ]);
         //customPriceStatus : PRODUCT ĐƯỢC MỞ RỘNG GIÁ TRONG TBL_PRD_MAIN_SCALE
-        
-    
         page = !params.page ? 1 : params.page;
         limit = !params.limit ? 1 : params.limit;
         const offset = params.page * params.limit - params.limit;
@@ -120,40 +116,16 @@ module.exports = {
             }
           }
           //kết thúc tiến hành gán price mở rộng cho product
-    
+          responseProductPrice
 
           list[i] = {
-            seq: row.SEQ,
-            moa_code: row.M_MOA_CODE,
-            pos_regcode: row.M_POS_REGCODE,
-            code: row.P_CODE,
-            name: row.P_NAME,
-            category: customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
-            unit: row.P_UNIT,
-            barcode: row.P_BARCODE,
-            status: row.P_STATUS,
-            list_price: row.P_LIST_PRICE,
-            provider: row.P_PROVIDER,
-            sale_price: row.P_SALE_PRICE,         
             price_type: priceType,
             price_updown: priceUpdown,
             price_number: priceNumber,
             price_show: Math.round(priceShow),
-            is_use_qty : row.IS_USE_QTY,
-            default_qty: row.DEFAULT_QTY,
-            custom_qty : row.CUSTOM_QTY,
-            time_start: row.TIME_START,
-            value_qty: row.CUSTOM_QTY ? row.CUSTOM_QTY : row.CUSTOM_QTY
-              ? moment(row.TIME_START).format("YYYY-MM-DD")
-              : null,
+            category: customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
             images: customArrayImageProduct(row.P_IMG),
-            time_end: row.TIME_END
-              ? moment(row.TIME_END).format("YYYY-MM-DD")
-              : null,
-            create_name: row.C_NAME,
-            create_time: row.C_TIME,
-            update_name: row.M_NAME,
-            update_time: row.M_TIME,
+            ...responseProductPrice(row)         
           };
  
           i++;
