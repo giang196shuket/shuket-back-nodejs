@@ -16,6 +16,7 @@ const {
   arrayColumnAssign,
   customArrayImageProduct,
   customCategoryProduct,
+  convertTagsStringToArray,
 } = require("../../helper/funtion");
 const {
   loadImageAws,
@@ -25,6 +26,7 @@ const {
 const ip = require("ip");
 const { bucketImage, typeLog } = require("../../helper/const");
 const { requsetSearchListDate } = require("../../helper/request");
+const { configPriceForProduce } = require("./common");
 
 module.exports = {
   async searchProductRegisteredList(req, res, next) {
@@ -176,14 +178,13 @@ module.exports = {
       }
     }
     let params = requsetSearchListDate(req.body, [
-      "category_code",
-      "category_sub_code",
-      "option_check_stock",
-      "stock_search_value",
-      "sort_prd_stock",
-      "product_no_image",
-      "product_only_brgn",
-      "is_delivery",
+      "categoryCode",
+      "categorySubCode",
+      "optionCheckStock",
+      "stockSearchValue",
+      "sortPrdStock",
+      "productNoImage",
+      "productOnlyBrgn",
     ]);
     page = !params.page ? 1 : params.page;
     limit = !params.limit ? 1 : params.limit;
@@ -240,91 +241,7 @@ module.exports = {
         // dùng stock
         isProStock = 1;
       }
-      let priceType = "No";
-      let priceUpdown = "No";
-      let priceNumber = 0;
-      let priceShow = 0;
-      // bắt đầu tiến hành gán price mở rộng cho product
-      if (row.PRICE_CUSTOM_STATUS === "A") {
-        //dùng giá tiền mở rộng
-        if (row.PRICE_TYPE) {
-          //PRICE_TYPE : AM => AMOUNT, PC: PERCENT
-          priceType = row.PRICE_TYPE;
-        }
-        if (row.PRICE_UP_DOWN) {
-          priceUpdown = row.PRICE_UP_DOWN; //  tăng hoặc giảm giá
-          if (row.PRICE_TYPE === "PC") {
-            //PERCENT
-            if (row.PRICE_UP_DOWN === "U") {
-              // UP PRICE
-              if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                //P_SALE_PRICE: price đang sale
-                // PRICE_NUMBER : giá trị mở rộng
-                priceShow =
-                  (parseInt(row.P_SALE_PRICE) / 100) *
-                    parseInt(row.PRICE_NUMBER) +
-                  parseInt(row.P_SALE_PRICE);
-              } else {
-                //P_LIST_PRICE : price mặc định
-                priceShow =
-                  (parseInt(row.P_LIST_PRICE) / 100) *
-                    parseInt(row.PRICE_NUMBER) +
-                  parseInt(row.P_LIST_PRICE);
-              }
-            }
-            if (row.PRICE_UP_DOWN === "D") {
-              // DOWN PRICE
-              if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                //P_SALE_PRICE: price đang sale
-                // PRICE_NUMBER : giá trị mở rộng
-                priceShow =
-                  parseInt(row.P_SALE_PRICE) -
-                  (parseInt(row.P_SALE_PRICE) / 100) *
-                    parseInt(row.PRICE_NUMBER);
-              } else {
-                //P_LIST_PRICE : price mặc định
-                priceShow =
-                  parseInt(row.P_LIST_PRICE) -
-                  (parseInt(row.P_LIST_PRICE) / 100) *
-                    parseInt(row.PRICE_NUMBER);
-              }
-            }
-          }
-          if (row.PRICE_TYPE === "AM") {
-            // AMOUNT
-            if (row.PRICE_UP_DOWN === "U") {
-              // UP PRICE
-              if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                //P_SALE_PRICE: price đang sale
-                // PRICE_NUMBER : giá trị mở rộng
-                priceShow =
-                  parseInt(row.P_SALE_PRICE) + parseInt(row.PRICE_NUMBER);
-              } else {
-                //P_LIST_PRICE : price mặc định
-                priceShow =
-                  parseInt(row.P_LIST_PRICE) + parseInt(row.PRICE_NUMBER);
-              }
-            }
-            if (row.PRICE_UP_DOWN === "D") {
-              // DOWN PRICE
-              if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                //P_SALE_PRICE: price đang sale
-                // PRICE_NUMBER : giá trị mở rộng
-                priceShow =
-                  parseInt(row.P_SALE_PRICE) - parseInt(row.PRICE_NUMBER);
-              } else {
-                //P_LIST_PRICE : price mặc định
-                priceShow =
-                  parseInt(row.P_LIST_PRICE) - parseInt(row.PRICE_NUMBER);
-              }
-            }
-          }
-        }
-        if (row.PRICE_NUMBER) {
-          priceNumber = parseInt(row.PRICE_NUMBER);
-        }
-      }
-      //kết thúc tiến hành gán price mở rộng cho product
+      const dataPrice = configPriceForProduce(row)
 
       //gán giá trị nếu product có dùng max và min quantity khi order
 
@@ -335,10 +252,10 @@ module.exports = {
       list[i] = {
         category: customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
         is_pro_stock: isProStock,
-        price_type: priceType,
-        price_updown: priceUpdown,
-        price_number: priceNumber,
-        price_show: Math.round(priceShow),
+        price_type: dataPrice.priceType,
+        price_updown: dataPrice.priceUpdown,
+        price_number: dataPrice.priceNumber,
+        price_show: Math.round(dataPrice.priceShow),
         pro_show_settings_max_min: proSettingsMaxMin,
         ...responseProductRegisted(row)
       };
@@ -397,14 +314,18 @@ module.exports = {
 
     let dataResponse = {
       ...responseDataList(page, limit, dataListProduct.search_count, list),
-      default_stock: defaultStock,
-      is_using_maxqty: checkUseMaxQty.USE_MAXQTY_PRODUCT,
-      default_minqty: !checkUseMaxQty.MINQTY_PRODUCT_VALUE
-        ? 1
-        : checkUseMaxQty.MINQTY_PRODUCT_VALUE,
-      show_settings_max_min: showSettingMaxMin,
-      is_using_stock: isUsingStock,
-      inital_stock: initialStock,
+      valueMinMax: {
+        is_using_maxqty: checkUseMaxQty.USE_MAXQTY_PRODUCT,
+        default_maxqty: !checkUseMaxQty.MAXQTY_PRODUCT_VALUE ? 1 : checkUseMaxQty.MAXQTY_PRODUCT_VALUE,
+        is_using_minqty: checkUseMaxQty.USE_MINQTY_PRODUCT,
+        default_minqty: !checkUseMaxQty.MINQTY_PRODUCT_VALUE ? 1 : checkUseMaxQty.MINQTY_PRODUCT_VALUE,
+      },
+      valueStock:{
+        default_stock: defaultStock,
+        is_using_stock: isUsingStock,
+        inital_stock: initialStock,
+      },
+      // show_settings_max_min: showSettingMaxMin,
       will_be_run: willBeRun,
       time_now: moment().format("YYYY-MM-DD hh:mm:ss"),
       time_sync: timeSync,
@@ -567,9 +488,11 @@ module.exports = {
         thumb: loadNoImage(),
       });
     }
+    console.log(product)
     let dataResponse = {
       row_detail: {
         ...responseProductDetai(product),
+        tags: convertTagsStringToArray(product.P_TAGS),
         category: product.P_CATE ? product.P_CATE : arrCate[0].P_CAT,
         cate_list: dataCate,
         images: arrImg,
@@ -615,5 +538,37 @@ module.exports = {
       .status(200)
       .json(responseSuccess(200, messageSuccess.Success, dataResponse));
   },
- 
+
+  //update image and tags for product 
+  
+  async updateProduct(req, res, next) {
+    const { prd_seq, prd_tags, prd_images} = req.body;
+    // prd_tags : mảng chuỗi tag
+    // prd_images : mảng object image
+    // prd_seq: seq 
+
+    const  prdImages = prd_images.map((img)=> ({ sv_key : "sv1", items: [{key:"thumb", value: img.thumb}], 
+    main: img.main, priority: img.priority}))
+    
+    //chuyen mang tags => chuoi tags
+    let  prdTags = prd_tags.reduce((accumulator, currentValue) => accumulator + "#" + currentValue, "");
+
+    console.log((prdImages))
+    console.log((prdTags))
+
+    const user = req.userInfo;
+    const time = moment().format('YYYY-MM-DD HH:mm:ss')
+    const result = await queriesHelper.updateTableWhere('TBL_MOA_PRD_MAIN', ` P_IMG = '${JSON.stringify(prdImages)}',
+    P_TAGS = '${prdTags}', M_TIME = '${time}', M_ID = '${user.user_id}'`, `SEQ = '${prd_seq}'`)
+
+    if(result){ 
+      return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success, messageSuccess.Success));
+    }else{
+      return res
+      .status(200)
+      .json(responseSuccess(200, messageError.updateFailed, messageError.updateFailed));
+    }
+  },
 };

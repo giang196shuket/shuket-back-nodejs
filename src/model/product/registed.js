@@ -138,13 +138,13 @@ module.exports = class productRegistedModel {
       dateEnd,
       status,
       orderBy,
-      category_code,
-      category_sub_code,
-      option_check_stock,
-      stock_search_value,
-      product_no_image,
-      product_only_brgn,
-      sort_prd_stock,
+      categoryCode,
+      categorySubCode,
+      optionCheckStock,
+      stockSearchValue,
+      productNoImage,
+      productOnlyBrgn,
+      sortPrdStock,
     },
     offset,
     limit
@@ -208,37 +208,37 @@ module.exports = class productRegistedModel {
         }
         //find with up : stock search  > stock of product
         if (
-          option_check_stock !== "" &&
-          option_check_stock === "U" &&
-          stock_search_value !== ""
+          optionCheckStock !== "" &&
+          optionCheckStock === "U" &&
+          stockSearchValue !== ""
         ) {
-          whereSearchUpDown = ` AND STK_STOCK > ${stock_search_value} `;
-          whereSearchUpDownSub = ` AND TBSTOCK.STK_STOCK > ${stock_search_value} `;
+          whereSearchUpDown = ` AND STK_STOCK > ${stockSearchValue} `;
+          whereSearchUpDownSub = ` AND TBSTOCK.STK_STOCK > ${stockSearchValue} `;
         }
         //find with down : stock search  < stock of product
         if (
-          option_check_stock !== "" &&
-          option_check_stock === "D" &&
-          stock_search_value !== ""
+          optionCheckStock !== "" &&
+          optionCheckStock === "D" &&
+          stockSearchValue !== ""
         ) {
-          whereSearchUpDown = ` AND STK_STOCK < ${stock_search_value} `;
-          whereSearchUpDownSub = ` AND (TBSTOCK.STK_STOCK < ${stock_search_value} OR TBSTOCK.STK_STOCK IS NULL) `;
+          whereSearchUpDown = ` AND STK_STOCK < ${stockSearchValue} `;
+          whereSearchUpDownSub = ` AND (TBSTOCK.STK_STOCK < ${stockSearchValue} OR TBSTOCK.STK_STOCK IS NULL) `;
         }
       }
       if (keywordType && keywordValue) {
-        if (keywordType === "prd_code") {
+        if (keywordType === "code") {
           //search product code
           where += ` AND P_CODE = '${keywordValue}'  `;
           whereSub += ` AND PM.P_CODE = '${keywordValue}'  `;
-        } else if (keywordType === "prd_barcode") {
+        } else if (keywordType === "barcode") {
           //search theo barcode
           where += ` AND P_BARCODE = '${keywordValue}'  `;
           whereSub += ` AND PM.P_BARCODE = '${keywordValue}'  `;
-        } else if (keywordType === "prd_name") {
+        } else if (keywordType === "name") {
           //search theo product name
           where += ` AND P_NAME LIKE '%"${keywordValue}"%'  `;
           whereSub += ` AND PM.P_NAME LIKE '%"${keywordValue}"%'  `;
-        } else if (keywordType === "prd_tags") {
+        } else if (keywordType === "tags") {
           //search theo product tags
           where += ` AND P_TAGS LIKE '%"${keywordValue}"%'  `;
           whereSub += ` AND PM.P_TAGS LIKE '%"${keywordValue}"%'  `;
@@ -253,17 +253,17 @@ module.exports = class productRegistedModel {
         where += `  AND M_MOA_CODE = '${dataConnect.M_MOA_CODE}' `;
         whereSub += ` AND PM.M_MOA_CODE = '${dataConnect.M_MOA_CODE}' `;
       }
-      if (category_code) {
+      if (categoryCode) {
         // search theo số category code
-        where += ` AND CTGRY_LARGE_NO = '${category_code}' `;
+        where += ` AND CTGRY_LARGE_NO = '${categoryCode}' `;
         whereSub += ` AND (SELECT CTGRY_LARGE_NO FROM ${dataConnect.M_DB_CONNECT}.MART_CTGRY WHERE CTGRY_SEQNO = MOG.CTGRY_SEQNO 
-        AND MART_SEQNO = MOG.MART_SEQNO LIMIT 1) = ${category_code} `;
+        AND MART_SEQNO = MOG.MART_SEQNO LIMIT 1) = ${categoryCode} `;
       }
-      if (category_sub_code) {
+      if (categorySubCode) {
         //search theo số category sub code
-        where += ` AND SEQ_P_CAT_SUB = '${category_sub_code}'  `;
+        where += ` AND SEQ_P_CAT_SUB = '${categorySubCode}'  `;
         whereSub += ` AND (SELECT MC.CTGRY_SEQNO FROM  ${dataConnect.M_DB_CONNECT}.MART_CTGRY AS MC WHERE MC.MART_SEQNO = MOG.MART_SEQNO 
-        AND MC.CTGRY_SEQNO = MOG.CTGRY_SEQNO)  =  ${category_sub_code}  `;
+        AND MC.CTGRY_SEQNO = MOG.CTGRY_SEQNO)  =  ${categorySubCode}  `;
       }
       if (status && status !== "O") {
         //statuus != out of stock
@@ -288,17 +288,17 @@ module.exports = class productRegistedModel {
         where += ` AND DATE_FORMAT(C_TIME , '%Y-%m-%d') <=  DATE_FORMAT('${dateStart}' , '%Y-%m-%d')  `;
         whereSub += ` AND DATE_FORMAT(PM.C_TIME , '%Y-%m-%d') <=  DATE_FORMAT('${dateStart}' , '%Y-%m-%d')  `;
       }
-      if (product_no_image && product_no_image === "Y") {
+      if (productNoImage && productNoImage === "Y") {
         // search product nào có hình ảnh
         where += ` AND (P_IMG IS NOT NULL AND P_IMG != '[]')   `;
         whereSub += ` AND  (PM.P_IMG IS NOT NULL AND PM.P_IMG != '[]')    `;
       }
-      if (product_no_image && product_no_image === "N") {
+      if (productNoImage && productNoImage === "N") {
         // search product nào không có hình ảnh
         where += ` AND (P_IMG IS  NULL AND P_IMG = '[]')   `;
         whereSub += ` AND (PM.P_IMG IS  NULL AND PM.P_IMG ='[]')    `;
       }
-      if (product_only_brgn && product_only_brgn === 'Y') {
+      if (productOnlyBrgn && productOnlyBrgn === 'Y') {
         //search product nào đang có khuyến mãi
         where +=
           " AND P_SALE_PRICE > 0 AND  (PRICE_CUSTOM_STATUS NOT IN ('A') OR PRICE_CUSTOM_STATUS IS NULL)  ";
@@ -314,11 +314,11 @@ module.exports = class productRegistedModel {
 
       // thêm điều kiện order by
       let whereOrder = "";
-      if (sort_prd_stock !== "") {
-        if (sort_prd_stock === "DESC") {
+      if (sortPrdStock !== "") {
+        if (sortPrdStock === "DESC") {
           whereOrder = " ORDER BY STK_STOCK DESC ";
         }
-        if (sort_prd_stock === "ASC") {
+        if (sortPrdStock === "ASC") {
           whereOrder = " ORDER BY STK_STOCK ASC ";
         }
       } else {

@@ -1,15 +1,19 @@
  const messageSuccess = {
     Success : 'Your request is successful',
     updateSuccess: "Updated data",
+    registerSuccess: "Registration success",
+
 }
 const messageOrther = {
    IdExist : 'Id already exists',
    IdNotExist: "Id valid",
 }
  const messageError = {
+   RegisterFailure:" Registration failed",
    ScreenCodeNotExists: "The screen code not exists in the system",
    InvalidMethod:"Invalid http method", //405
    uploadFailed: "Upload failed",
+   updateFailed: "Updated Failed",
    mimetypeNotValid: "File mimetype not valid",
    sendNotificationSucess : 'Send notification success',
    IdNotEmpty:'The id field can not empty',

@@ -364,8 +364,8 @@ module.exports = class productInventoryModel {
                 ) SUB1
                 WHERE SUB1.M_MOA_CODE = '${dataConnect.M_MOA_CODE}'
                 GROUP BY GPCODE
-        ) SUB  ${where} ${stringWhereIn} ${whereOrder} ${whereLimit}`;
-      logger.writeLog("error", `${logBase} : ${sql}`);
+        ) SUB  ${where} ${stringWhereIn}`;
+      logger.writeLog("error", `${logBase} : ${sqlCount}`);
 
       const [rows] = await pool.mysqlPool.query(sql);
 

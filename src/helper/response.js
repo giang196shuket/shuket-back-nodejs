@@ -161,6 +161,7 @@ const responseProductPrice = (row) => {
     seq: row.SEQ,
     moa_code: row.M_MOA_CODE,
     pos_regcode: row.M_POS_REGCODE,
+    id: row.P_CODE,
     code: row.P_CODE,
     name: row.P_NAME,
     unit: row.P_UNIT,
@@ -172,17 +173,19 @@ const responseProductPrice = (row) => {
     is_use_qty: row.IS_USE_QTY,
     default_qty: row.DEFAULT_QTY,
     custom_qty: row.CUSTOM_QTY,
-    time_start: row.TIME_START,
     value_qty: row.CUSTOM_QTY
       ? row.CUSTOM_QTY
       : row.CUSTOM_QTY
       ? moment(row.TIME_START).format("YYYY-MM-DD")
       : null,
-    time_end: row.TIME_END ? moment(row.TIME_END).format("YYYY-MM-DD") : null,
+      timeStart: row.TIME_START ? moment(row.TIME_START).format("YYYY-MM-DD") : null,
+    timeEnd: row.TIME_END ? moment(row.TIME_END).format("YYYY-MM-DD") : null,
     create_name: row.C_NAME,
     create_time: row.C_TIME,
     update_name: row.M_NAME,
     update_time: row.M_TIME,
+    sale_title: row.P_SALE_TITLE,
+    sale_src: row.SALE_SRC,
   };
 };
 const responseProductInventory = (row) => {
@@ -255,6 +258,7 @@ const responseProductRegisted = (row) => {
 const responseProductUnregisted = (row) => {
   return {
     posRegcode: row.M_POS_REGCODE,
+    id: row.P_CODE,
     code: row.P_CODE,
     name: row.P_NAME,
     category: row.P_CAT,
@@ -465,7 +469,6 @@ const responseProductDetai = (product) =>{
     provider: product.P_PROVIDER,
     sale_price: product.P_SALE_PRICE,
     sale_title: product.P_SALE_TITLE,
-    tags: product.P_TAGS,
   }
 }
 module.exports = {

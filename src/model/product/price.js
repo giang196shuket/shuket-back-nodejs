@@ -5,6 +5,49 @@ const productCommonModel = require("../../model/product/common");
 
 
 module.exports = class productPriceModel {
+  static async updatePriceOfProduct(martId, userId , price, priceType, priceUpDown, priceNumber, useTime, timeStart, timeEnd, code, barcode){
+    let logBase = `productPriceModel.updatePriceOfProduct: `;
+    try {
+      const time = moment().format('YYYY-MM-DD HH:mm:ss')
+
+    let  sql = ` UPDATE TBL_MOA_PRD_SCALE 
+    SET P_PRICE = '${price}',
+    PS_TYPE = '${priceType}',
+    PS_TYPE_OPTION = '${priceUpDown}',
+    PS_NUM = '${priceNumber}',
+    PS_STATUS = 'A',
+    M_TIME = '${time}',
+    M_ID = '${userId}',
+    USE_TIME = '${useTime}',
+    TIME_START = '${timeStart}',
+    TIME_END = '${timeEnd}'
+    WHERE M_MOA_CODE = '${martId}' AND P_CODE = '${code}' AND P_BARCODE = '${barcode}'`;
+
+    logger.writeLog("info", `${logBase} : ${sql}`);
+    const [rows] = await pool.mysqlPool.query(sql);
+    return rows.affectedRows
+  } catch (error) {
+    logger.writeLog("error", `${logBase} : ${error.stack}`);
+    return 0
+  }
+}
+  static async insertPriceOfProduct(martId, barcode,code, unit, price,priceType,priceUpDown, priceNumber,userId, useTime, timeStart, timeEnd){
+   let logBase = `productPriceModel.insertPriceOfProduct: `;
+   try {
+    const time = moment().format('YYYY-MM-DD HH:mm:ss')
+   let  sql = ` INSERT INTO TBL_MOA_PRD_SCALE
+    (M_MOA_CODE, P_BARCODE, P_CODE, P_UNIT, P_PRICE, PS_TYPE, PS_TYPE_OPTION, PS_NUM, PS_STATUS, C_TIME, C_ID, USE_TIME, TIME_START, TIME_END )
+     VALUES  ('${martId}','${barcode}','${code}','${unit}','${price}','${priceType}','${priceUpDown}','${priceNumber}', 'A', '${time}',
+     '${userId}','${useTime}','${timeStart}','${timeEnd}')`;
+
+   logger.writeLog("info", `${logBase} : ${sql}`);
+   const [rows] = await pool.mysqlPool.query(sql);
+   return rows.affectedRows
+ } catch (error) {
+   logger.writeLog("error", `${logBase} : ${error.stack}`);
+   return 0
+ }
+}
   static async searchProductPriceList(
     dataConnect,
     status,

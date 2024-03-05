@@ -40,6 +40,7 @@ const martBGColorDefault = "#14b9cc";
 
 const typeLog = {
   SetCustomMaxMinQty: "SET CUSTOM MAX MIN QTY",
+  SetAllMaxMinQty: "SET ALL MAX MIN QTY",
 };
 
 const days = {

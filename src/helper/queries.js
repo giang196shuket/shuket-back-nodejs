@@ -42,6 +42,19 @@ module.exports = class queriesHelper {
           return null
         }
       }
+      static async getRowDataFieldWhereHavingGroupby(field, table, where, groupby, having ) {
+        let logBase = `queriesHelper.getRowDataFieldWhereHavingGroupby: `;
+          try {
+          let  sql = `SELECT ${field}  FROM ${table} WHERE ${where} GROUP BY ${groupby} having ${having}`;
+
+          logger.writeLog("info", `${logBase} : ${sql}`);
+          const [rows] = await pool.mysqlPool.query(sql);
+          return rows[0]
+        } catch (error) {
+          logger.writeLog("error", `${logBase} : ${error.stack}`);
+          return null
+        }
+      }
       static async getListDataFieldWhere(field, table, where) {
         let logBase = `queriesHelper.getListDataFieldWhere: `;
           try {

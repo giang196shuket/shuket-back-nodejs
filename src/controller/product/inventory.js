@@ -7,6 +7,7 @@ const { responseDataList, responseSuccess, responseProductInventory } = require(
 const productInventoryModel = require("../../model/product/inventory");
 const { loadImageAwsProduct, loadNoImage } = require("../../service/loadImage");
 const moment = require("moment");
+const { configPriceForProduce } = require("./common");
 module.exports = {
     async searchProductInventoryList(req, res, next) {
         const logBase = "controlller/product/register.searchProductRegisteredList";
@@ -105,104 +106,22 @@ module.exports = {
         let list = [];
         let i = 0;
         let showSettingMaxMin = "N";
+
         for (const row of dataListProduct.rows) {
           let isProStock = 0;
           if (row.P_INV_TYPE > 0 || (!row.P_INV_TYPE && row.G_INV_TYPE > 0)) {
             // dùng stock
             isProStock = 1;
           }
-          let priceType = "No";
-          let priceUpdown = "No";
-          let priceNumber = 0;
-          let priceShow = 0;
-          // bắt đầu tiến hành gán price mở rộng cho product
-          if (row.PRICE_CUSTOM_STATUS === "A") {
-            //dùng giá tiền mở rộng
-            if (row.PRICE_TYPE) {
-              //PRICE_TYPE : AM => AMOUNT, PC: PERCENT
-              priceType = row.PRICE_TYPE;
-            }
-            if (row.PRICE_UP_DOWN) {
-              priceUpdown = row.PRICE_UP_DOWN; //  tăng hoặc giảm giá
-              if (row.PRICE_TYPE === "PC") {
-                //PERCENT
-                if (row.PRICE_UP_DOWN === "U") {
-                  // UP PRICE
-                  if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                    //P_SALE_PRICE: price đang sale
-                    // PRICE_NUMBER : giá trị mở rộng
-                    priceShow =
-                      (parseInt(row.P_SALE_PRICE) / 100) *
-                        parseInt(row.PRICE_NUMBER) +
-                      parseInt(row.P_SALE_PRICE);
-                  } else {
-                    //P_LIST_PRICE : price mặc định
-                    priceShow =
-                      (parseInt(row.P_LIST_PRICE) / 100) *
-                        parseInt(row.PRICE_NUMBER) +
-                      parseInt(row.P_LIST_PRICE);
-                  }
-                }
-                if (row.PRICE_UP_DOWN === "D") {
-                  // DOWN PRICE
-                  if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                    //P_SALE_PRICE: price đang sale
-                    // PRICE_NUMBER : giá trị mở rộng
-                    priceShow =
-                      parseInt(row.P_SALE_PRICE) -
-                      (parseInt(row.P_SALE_PRICE) / 100) *
-                        parseInt(row.PRICE_NUMBER);
-                  } else {
-                    //P_LIST_PRICE : price mặc định
-                    priceShow =
-                      parseInt(row.P_LIST_PRICE) -
-                      (parseInt(row.P_LIST_PRICE) / 100) *
-                        parseInt(row.PRICE_NUMBER);
-                  }
-                }
-              }
-              if (row.PRICE_TYPE === "AM") {
-                // AMOUNT
-                if (row.PRICE_UP_DOWN === "U") {
-                  // UP PRICE
-                  if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                    //P_SALE_PRICE: price đang sale
-                    // PRICE_NUMBER : giá trị mở rộng
-                    priceShow =
-                      parseInt(row.P_SALE_PRICE) + parseInt(row.PRICE_NUMBER);
-                  } else {
-                    //P_LIST_PRICE : price mặc định
-                    priceShow =
-                      parseInt(row.P_LIST_PRICE) + parseInt(row.PRICE_NUMBER);
-                  }
-                }
-                if (row.PRICE_UP_DOWN === "D") {
-                  // DOWN PRICE
-                  if (row.P_SALE_PRICE && row.P_SALE_PRICE > 0) {
-                    //P_SALE_PRICE: price đang sale
-                    // PRICE_NUMBER : giá trị mở rộng
-                    priceShow =
-                      parseInt(row.P_SALE_PRICE) - parseInt(row.PRICE_NUMBER);
-                  } else {
-                    //P_LIST_PRICE : price mặc định
-                    priceShow =
-                      parseInt(row.P_LIST_PRICE) - parseInt(row.PRICE_NUMBER);
-                  }
-                }
-              }
-            }
-            if (row.PRICE_NUMBER) {
-              priceNumber = parseInt(row.PRICE_NUMBER);
-            }
-          }
-          //kết thúc tiến hành gán price mở rộng cho product
+          const dataPrice = configPriceForProduce(row)
+
               list[i] = {          
             category:  customCategoryProduct(row.P_CAT,row.P_CAT_MID, row.P_CAT_SUB),
             is_pro_stock: isProStock,
-            price_type: priceType,
-            price_updown: priceUpdown,
-            price_number: priceNumber,
-            price_show: Math.round(priceShow),        
+            price_type: dataPrice.priceType,
+            price_updown: dataPrice.priceUpdown,
+            price_number: dataPrice.priceNumber,
+            price_show: Math.round(dataPrice.priceShow),        
             images: customArrayImageProduct(row.P_IMG),
             ...responseProductInventory(row)         
           };
@@ -257,9 +176,11 @@ module.exports = {
  
         let dataResponse = {
           ...responseDataList(page, limit, dataListProduct.search_count, list),
-          default_stock: defaultStock,      
-          isUsingStock: isUsingStock,
-          initialStock: initialStock,
+          valueStock:{
+            default_stock: defaultStock,
+            is_using_stock: isUsingStock,
+            inital_stock: initialStock,
+          },
         };
     
         return res

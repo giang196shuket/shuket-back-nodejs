@@ -124,6 +124,11 @@ function convertArrayToStringForWhereIn(arr) {
 function generateTag(tages) {
   return tages.map((tag) => "#" + tag).join("");
 }
+ //convert tag string => array
+function convertTagsStringToArray(tages) {
+  return tages.split("#").filter(Boolean);
+}
+
 //custom category của product
 function customCategoryProduct(P_CAT, P_CAT_MID, P_CAT_SUB) {
   return (
@@ -212,7 +217,14 @@ function arrayColumnAssign(data, columnName, indexName) {
   //result: {268650080: 3}
 }
 
+//thay thế mọi ký tự đặc biệt  trong câu query sql
+function escapeLikeStr(str) {
+  return str.replace(/[\\%_]/g, '\\$&');
+}
+
 module.exports = {
+  escapeLikeStr,
+  convertTagsStringToArray,
   generateNextMoaCode,
   generateNewTopic,
   convertArrayToStringForWhereIn,
