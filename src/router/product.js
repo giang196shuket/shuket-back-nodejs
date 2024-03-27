@@ -29,6 +29,9 @@ router.post("/search_product_inventory_list",  middleware.verifyToken, controlle
 //price
 router.post("/search_product_price_list",  middleware.verifyToken, controllerPrice.searchProductPriceList);
 router.post("/set_price_for_product",  middleware.verifyToken, controllerPrice.setPriceForProduct);
+router.post("/delete_price_product",  middleware.verifyToken, controllerPrice.deletePriceProduct);
+
+
 
 //COMMON
 router.post("/setting_all_max_min_product",  middleware.verifyToken, controller.settingAllMaxMinProduct); // cho toàn bộ product

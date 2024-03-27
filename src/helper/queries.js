@@ -122,4 +122,27 @@ module.exports = class queriesHelper {
         return 0
       }
       }
+      static async deleteTableWhere(table, arrWhere ){
+        let logBase = `queriesHelper.deleteTableWhere: `;
+        try {
+        let where = ""
+        for (let i = 0; i < arrWhere.length; i++) {
+          if(i === arrWhere.length - 1){
+            where += arrWhere[i] + " AND "
+          }else{
+            where += arrWhere[i] 
+
+          }
+        }
+
+        let  sql = `DELETE FROM ${table} WHERE  ${where }`;
+
+        logger.writeLog("info", `${logBase} : ${sql}`);
+        // const [rows] = await pool.mysqlPool.query(sql);
+        return 1
+      } catch (error) {
+        logger.writeLog("error", `${logBase} : ${error.stack}`);
+        return 0
+      }
+      }
 }

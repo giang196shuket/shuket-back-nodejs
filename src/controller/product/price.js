@@ -9,6 +9,23 @@ const { loadImageAwsProduct, loadNoImage } = require("../../service/loadImage");
 const moment = require("moment");
 const { configPriceForProduce } = require("./common");
 module.exports = {
+  async deletePriceProduct (req, res, next) {
+    const martId = req.userInfo.u_martid
+    let {barcode, code ,list_price, sale_price, priceNumber, priceType, priceUpDown} = req.body
+    const result = await queriesHelper.deleteTableWhere('TBL_MOA_PRD_SCALE', 
+    [` M_MOA_CODE = '${martId}' `, `P_BARCODE = '${barcode}'`, `P_CODE = '${code}'`])
+    
+    if(result > 0){
+      return res
+      .status(200)
+      .json(responseSuccess(200, messageSuccess.Success,  messageSuccess.Success));
+    }else{
+      return res
+      .status(200)
+      .json(responseErrorInput(messageError.RegisterFailure));
+    }
+
+  },
   async setPriceForProduct(req, res, next) {
     const user = req.userInfo;
     const dataConnect = req.dataConnect
@@ -131,8 +148,6 @@ module.exports = {
           const dataPrice = configPriceForProduce(row)
 
           //kết thúc tiến hành gán price mở rộng cho product
-          responseProductPrice
-
           list[i] = {
             priceType: dataPrice.priceType,
             priceUpDown: dataPrice.priceUpdown,

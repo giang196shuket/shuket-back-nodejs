@@ -186,6 +186,8 @@ const responseProductPrice = (row) => {
     update_time: row.M_TIME,
     sale_title: row.P_SALE_TITLE,
     sale_src: row.SALE_SRC,
+    is_show_price: row.PRICE_CUSTOM_STATUS,
+
   };
 };
 const responseProductInventory = (row) => {

@@ -227,7 +227,6 @@ module.exports = {
         priceNumber = parseInt(row.PRICE_NUMBER);
       }
     }
-    console.log('row', row)
 
 
     return {
