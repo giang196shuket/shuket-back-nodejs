@@ -1,2 +1,4 @@
 # SHUKET-BACK-NODEJS-API
-npm install => npm start
+npm i
+
+npm start
