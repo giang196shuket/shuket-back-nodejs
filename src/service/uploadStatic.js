@@ -17,7 +17,7 @@ const { messageError } = require('../helper/message');
             if (err) {
               cb(null, false, req.multerError = messageError.uploadFailed);
             } else {
-              console.log('Thư mục đã được tạo thành công!');
+              // console.log('Thư mục đã được tạo thành công!');
             }
           });
           cb(null, folder);

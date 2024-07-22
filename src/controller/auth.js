@@ -22,6 +22,7 @@ module.exports = {
                 user_id: result.data.user_id,
                 martid: result.data.u_martid,
                 name: result.data.u_name,
+                displayName: result.data.u_name,
                 phone: result.data.u_phone,
                 email: result.data.u_email,
                 level: result.data.u_level,

@@ -120,85 +120,85 @@ module.exports = {
     }
 
     for (const row of rowsList) {
-      let dataDelivery = []
-      if(row.type = "ADMIN"){
-          //SD : NORMAL DELIVERY
-         dataDelivery = [{
-          code: 'SD',
-          value_fee: parseInt(normalDeliveryAmount),
-          name: "일반",
-          class: "row2",
-          color: "#34495e",
-          value_fee_old: parseInt(normalDeliveryAmount),
-          value_time: parseInt(normalDeliveryTime),
-          option_use: optionUse
-        },
-        {
-          code: 'QD',
-          value_fee: parseInt(quickDeliveryAmount),
-          name: "빠른",
-          class: "row1",
-          color: "#34495e",
-          value_fee_old: parseInt(quickDeliveryAmount),
-          value_time: parseInt(quickDeliveryTime),
-          option_use: optionUse
-        }]
-     //QD : QUICK DELIVERY
+    //   let dataDelivery = []
+    //   if(row.type = "ADMIN"){
+    //       //SD : NORMAL DELIVERY
+    //      dataDelivery = [{
+    //       code: 'SD',
+    //       value_fee: parseInt(normalDeliveryAmount),
+    //       name: "일반",
+    //       class: "row2",
+    //       color: "#34495e",
+    //       value_fee_old: parseInt(normalDeliveryAmount),
+    //       value_time: parseInt(normalDeliveryTime),
+    //       option_use: optionUse
+    //     },
+    //     {
+    //       code: 'QD',
+    //       value_fee: parseInt(quickDeliveryAmount),
+    //       name: "빠른",
+    //       class: "row1",
+    //       color: "#34495e",
+    //       value_fee_old: parseInt(quickDeliveryAmount),
+    //       value_time: parseInt(quickDeliveryTime),
+    //       option_use: optionUse
+    //     }]
+    //  //QD : QUICK DELIVERY
 
-      }else{
-         if(row.time_reset){
-            if(row.time_reset !== parseInt(dataAmountTime.TIME_SET_DEFAULT_DELIVERY)){
-              dataDelivery = JSON.parse(row.delivery_fee)
-              let iRun = 0
-              dataDelivery.forEach(itemDelivery => {
-                if(itemDelivery.code === 'SD' && itemDelivery.value_fee !== parseInt(dataAmountTime.DEFAULT_NORMAL_DELIVERY)){
-                  //SD : NORMAL DELIVERY
-                  dataDelivery[iRun].color = '#e43a45';
-                  dataDelivery[iRun].value_fee_old = parseInt(itemDelivery.value_fee)
-                }
-                if(itemDelivery.code === 'QD' && itemDelivery.value_fee !== parseInt(dataAmountTime.DEFAULT_QUICK_DELIVERY)){
-                  //QD : QUICK DELIVERY
+    //   }else{
+    //      if(row.time_reset){
+    //         if(row.time_reset !== parseInt(dataAmountTime.TIME_SET_DEFAULT_DELIVERY)){
+    //           dataDelivery = JSON.parse(row.delivery_fee)
+    //           let iRun = 0
+    //           dataDelivery.forEach(itemDelivery => {
+    //             if(itemDelivery.code === 'SD' && itemDelivery.value_fee !== parseInt(dataAmountTime.DEFAULT_NORMAL_DELIVERY)){
+    //               //SD : NORMAL DELIVERY
+    //               dataDelivery[iRun].color = '#e43a45';
+    //               dataDelivery[iRun].value_fee_old = parseInt(itemDelivery.value_fee)
+    //             }
+    //             if(itemDelivery.code === 'QD' && itemDelivery.value_fee !== parseInt(dataAmountTime.DEFAULT_QUICK_DELIVERY)){
+    //               //QD : QUICK DELIVERY
 
-                  dataDelivery[iRun].color = '#e43a45';
-                  dataDelivery[iRun].value_fee_old = parseInt(itemDelivery.value_fee)
-                }
-                if(itemDelivery.code === 'SD'){
-                  dataDelivery[iRun].name = '일반';
-                }
-                if(itemDelivery.code === 'QD'){
-                  dataDelivery[iRun].name = '빠른';
-                }
-                dataDelivery[iRun].option_use = itemDelivery.option_use
-                iRun++
-              });
-            }else{
-              //SD : NORMAL DELIVERY
+    //               dataDelivery[iRun].color = '#e43a45';
+    //               dataDelivery[iRun].value_fee_old = parseInt(itemDelivery.value_fee)
+    //             }
+    //             if(itemDelivery.code === 'SD'){
+    //               dataDelivery[iRun].name = '일반';
+    //             }
+    //             if(itemDelivery.code === 'QD'){
+    //               dataDelivery[iRun].name = '빠른';
+    //             }
+    //             dataDelivery[iRun].option_use = itemDelivery.option_use
+    //             iRun++
+    //           });
+    //         }else{
+    //           //SD : NORMAL DELIVERY
 
-              dataDelivery = [{
-                code: 'SD',
-                value_fee: parseInt(row.DEFAULT_NORMAL_DELIVERY),
-                name: "일반",
-                class: "row2",
-                color: "#34495e",
-                value_fee_old: parseInt(row.DEFAULT_NORMAL_DELIVERY),
-                value_time: parseInt(normalDeliveryTime),
-                option_use: optionUse
-              },
-              {
-                code: 'QD',
-                value_fee: parseInt(row.DEFAULT_QUICK_DELIVERY),
-                name: "빠른",
-                class: "row1",
-                color: "#34495e",
-                value_fee_old: parseInt(row.DEFAULT_QUICK_DELIVERY),
-                value_time: parseInt(quickDeliveryTime),
-                option_use: optionUse
-              }]
-           //QD : QUICK DELIVERY
+    //           dataDelivery = [{
+    //             code: 'SD',
+    //             value_fee: parseInt(row.DEFAULT_NORMAL_DELIVERY),
+    //             name: "일반",
+    //             class: "row2",
+    //             color: "#34495e",
+    //             value_fee_old: parseInt(row.DEFAULT_NORMAL_DELIVERY),
+    //             value_time: parseInt(normalDeliveryTime),
+    //             option_use: optionUse
+    //           },
+    //           {
+    //             code: 'QD',
+    //             value_fee: parseInt(row.DEFAULT_QUICK_DELIVERY),
+    //             name: "빠른",
+    //             class: "row1",
+    //             color: "#34495e",
+    //             value_fee_old: parseInt(row.DEFAULT_QUICK_DELIVERY),
+    //             value_time: parseInt(quickDeliveryTime),
+    //             option_use: optionUse
+    //           }]
+    //        //QD : QUICK DELIVERY
 
-            }
-         }
-      }
+    //         }
+    //      }
+    //   }
       let dataDeliveryReturn = JSON.parse(row.delivery_fee)
       dataDeliveryReturn.forEach((itemReturn, key) => {
         dataDeliveryReturn[key].value_fee = parseInt(itemReturn.value_fee)

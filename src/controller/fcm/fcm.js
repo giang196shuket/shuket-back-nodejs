@@ -26,11 +26,10 @@ module.exports = {
       i++
     });
     const dataResponse = {
-      page_index : page,
-      page_size: limit,
-      page_count: Math.ceil(rows.length / limit),
-      search_count: rows.length,
-      fcm_list: list
+      page : page,
+      limit: limit,
+      total: rows.length,
+      list: list
     }
     return res
     .status(200)
