@@ -6,7 +6,7 @@ const { messageError } = require('../helper/message');
 
     const storage = multer.diskStorage({
         destination: function(req, file, cb) {
-          const folder = "src/file/"+req.body.action+"/"+req.body.mart_code
+          const folder = "src/upload/"+req.body.action+"/"+req.body.mart_code
 
           if (fs.existsSync(folder)) {
             // Nếu tồn tại, xóa thư mục

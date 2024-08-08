@@ -18,6 +18,7 @@ const martRouter = require("./src/router/mart");
 const fcmRouter = require("./src/router/fcm");
 const importRouter = require("./src/router/import");
 const appBuilderRouter = require("./src/router/appBuilder");
+const appPushRouter = require("./src/router/appPush");
 const imagesRouter = require("./src/router/images");
 const deliveryRouter = require("./src/router/delivery");
 const productRouter = require("./src/router/product");
@@ -27,13 +28,16 @@ const catalogRouter = require("./src/router/catalog");
 const appConfigRouter = require("./src/router/appConfig");
 const appInfoRouter = require("./src/router/appInfo");
 const orderRouter = require("./src/router/order");
+const path = require("path");
 
 const app = express();
 dotenv.config({ path: `${appRoot}/config/config.env` });
 
-app.use(helmet()); // bảo vệ http
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+})); // bảo vệ http
 app.use(compression()); // nén response cho nhẹ băng thông
-app.use(express.static("src/excel"));
+app.use("/upload", express.static(path.join(__dirname, "/src/upload")));
 app.use(cors({ origin: process.env.CLIENT_ADDRESS, credentials: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -66,6 +70,7 @@ app.use("/mart", martRouter);
 app.use("/fcm", fcmRouter);
 app.use("/import", importRouter);
 app.use("/appbuilder", appBuilderRouter);
+app.use("/apppush", appPushRouter);
 app.use("/images", imagesRouter);
 app.use("/delivery", deliveryRouter);
 app.use("/product", productRouter);
